@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Files</title>
+</head>
+<body>
+    <script>
+
+        FaceMatrix = function(faces){
+            this.faceMatrix = div();
+            for(var index in faces){
+                this.faceMatrix.append(new FacePanel(faces[index]));
+            }
+            return this.faceMatrix;
+        };
+
+        FacePanel = function (FaceData) {
+
+            this.facePanel = div().css('position','absolute').addClass('facePanel').css('background','rgba(0,0,0,0.25)').css('height','400px').css('width','600px');
+            this.buttonClick = function(formInputs){
+
+                var formData = formInputs;
+
+                return function(){
+                    var parentButton = $(this);
+                    var parentMatrix = parentButton.parent().parent().parent();
+                    parentMatrix.prepend(new GridFace())
+                }
+
+            };
+            this.searchBar = input('Search '+FaceData.items.length+' items in '+FaceData.folderName);
+            this.newFolderButton = buttonCol('New Folder','folder',4).css('backgroundColor',transparentWhiteHeavy());
+            this.newFileButton = buttonCol('New File','file',4).css('backgroundColor',transparentWhiteHeavy());
+            this.sortButton = buttonCol('Sort','sync',4).css('backgroundColor',transparentBlack()).css('color','white');
+            this.orderButton = buttonCol('Ascending','arrow-up',4).css('backgroundColor',transparentBlack()).css('color','white');
+            this.toolBar = row();
+            this.items = div();
+
+            for(var index in FaceData.items){
+                if(FaceData.items[index].type.matches('directory')){
+                    this.items.append(new DirectoryCard(FaceData.items[0]))
+                }
+                else if(FaceData.items[index].type.matches('file')){
+                    this.items.append(new FileCard(FaceData.items[0]))
+                }
+            }
+
+            return this.facePanel.append(
+                this.searchBar,
+                this.toolBar.append(
+                    this.newFolderButton,
+                    this.newFileButton,
+                    this.sortButton,
+                    this.orderButton
+                ),
+                this.items
+            )
+        };
+
+        var WebApp = function(){
+
+            var homeImage = 'http://beloweb.ru/wp-content/uploads/2014/10/Blurred-Background_2-800x461.jpg';
+
+            this.backgroundImage = div().addClass('backgroundImage');
+            this.backgroundImage.css(Styles.backgroundImage(homeImage));
+            this.navBarContainer = div().addClass('text-center').css('height','100px');
+            this.navBarRow =  div().css('height','150px').addClass('row').css('padding','50px');
+            this.contentContainer = $('<div>').css('background','rgba(255,255,255,0.75)');
+            this.contentContainer.addClass('text-center');
+        };
+
+        WebApp.prototype = {
+
+            login: function(){
+
+                var self = this;
+
+                swal.setDefaults({
+                    input: 'text',
+                    confirmButtonText: 'Next &rarr;',
+                    showCancelButton: false,
+                    showLoaderOnConfirm:true,
+                    animation: false,
+                    allowOutsideClick: false,
+                    progressSteps: ['1', '2']
+                });
+
+                var steps = [
+                    {
+                        title: 'Login',
+                        text: 'Enter your username below'
+                    },
+                    {
+                        title: 'Password',
+                        input:'password',
+                        showLoaderOnConfirm: true,
+                        text: 'Enter your password below'
+                    }
+                ];
+
+                if(Token === null || Token === 'null') {
+                    swal.queue(steps).then(function (result) {
+                        swal.resetDefaults();
+                        $.post('/files/login', {username: result[0], password: result[1]})
+                            .done(function (data) {
+                                console.log(data);
+                                if (data.success) {
+                                    Token = data.token;
+                                    sessionStorage.setItem('token',data.token);
+                                    swal({title: data.message, type: 'success'});
+                                    self.assemble(data);
+                                }
+                                else {
+                                    swal({title: data.message, type: 'error'})
+                                }
+                            });
+                    }, function () {
+                        swal.resetDefaults();
+                    });
+                }
+            },
+
+            assemble: function(data){
+                $('body').append(
+                    this.backgroundImage,
+                    this.contentContainer.append(
+                        this.navBarContainer.append(
+                            this.navBarRow.append(
+                                this.createNavElements(['Add','Forward','Back','Resize'])
+                            )
+                        ),
+                        new FaceMatrix(data)
+                    )
+                );
+            },
+
+            createNavElements:function(navNames){
+                var elements = [];
+                var navDiv = function(){
+                    return $('<div>').addClass('col-xs-3 hvr-glow').css('height','50px')
+                };
+                for(var i = 0;i<navNames.length;i++){
+                    elements.push(
+                        navDiv().text(navNames[i]).click()
+                    )
+                }
+                return elements;
+            }
+        };
+
+        getAllJsImports('libraries');
+        getAllJsImports('panels');
+        getAllJsImports('cards');
+
+        function importScript(path){
+            console.log(path);
+            $.ajax({
+                async: false,
+                url: 'public/'+path,
+                dataType: "script"
+            });
+        }
+
+        function getAllJsImports(pathExtension){
+            $.ajax({
+                async:false,
+                url:'imports/'+pathExtension,
+                success:function(data){
+                    console.log(data);
+                    $.each(data,function(){
+                        importScript(pathExtension+'/'+this.name);
+                    });
+                }
+            });
+        }
+
+        var WA = new WebApp();
+
+        WA.login();
+
+    </script>
+</body>
+</html>

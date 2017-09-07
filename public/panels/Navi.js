@@ -1,0 +1,5 @@
+var Navi = function () {
+
+
+
+};
