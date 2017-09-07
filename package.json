@@ -1,8 +1,8 @@
 {
-  "name": "gtiyo",
+  "name": "files",
   "version": "1.0.0",
-  "description": "Greater Toledo International Youth Orchestra",
-  "main": "Gtiyo.js",
+  "description": "Json based File manager for the web",
+  "main": "Files.js",
   "dependencies": {
     "body-parser": "^1.16.1",
     "directory-structure-json": "^1.0.0",
@@ -13,16 +13,16 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node Gtiyo.js"
+    "start": "node Files.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Logicium/gtiyo.git"
+    "url": "git+https://github.com/Logicium/Files.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Logicium/gtiyo/issues"
+    "url": "https://github.com/Logicium/Files/issues"
   },
-  "homepage": "https://github.com/Logicium/gtiyo#readme"
+  "homepage": "https://github.com/Logicium/Files#readme"
 }
