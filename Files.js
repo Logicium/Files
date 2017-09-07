@@ -18,7 +18,7 @@ app.set('port', (process.env.PORT || 5000));
 var urlencodedParser = bodyParser.urlencoded({ extended: true });
 app.use("/public",  express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({extended:false}));
-app.use(require('./Routes'));
+app.use(require('./server/Routes'));
 app.use('/files',require('./server/Files'));
 
 var server = app.listen(app.get('port'), function(){

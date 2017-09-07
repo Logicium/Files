@@ -4,8 +4,7 @@ var LinvoDB = require("linvodb3");
 LinvoDB.dbPath = process.cwd();
 var Databases = {};
 var UsersDB = new LinvoDB('users',{});
-var Folder = require('./libaries/Folder');
-
+var Folder = require('./libraries/Folder');
 
 Databases = {
     Users: UsersDB

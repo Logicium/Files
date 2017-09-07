@@ -8,8 +8,8 @@ var path = require('path');
 var jwt = require('jsonwebtoken');
 
 var Databases = require('./Databases');
-var Folder = require('./libaries/Folder');
-var File = require('./libaries/File');
+var Folder = require('./libraries/Folder');
+var File = require('./libraries/File');
 
 router.get('/',function(request,response){
     response.sendFile('/public/Files.html', {"root": __dirname});
@@ -57,5 +57,24 @@ router.get('/imports/libraries',function(request,response){
     });
 });
 
+router.get('/imports/cards',function(request,response){
+    var basepath = './public/cards';
+    DirectoryStructureJSON.getStructure(fs, basepath, function (err, structure, total) {
+        if (err) console.log(err);
+        console.log('there are a total of: ', total.folders, ' folders and ', total.files, ' files');
+        console.log('the structure looks like: ', JSON.stringify(structure, null, 4));
+        response.send(structure);
+    });
+});
+
+router.get('/imports/panels',function(request,response){
+    var basepath = './public/panels';
+    DirectoryStructureJSON.getStructure(fs, basepath, function (err, structure, total) {
+        if (err) console.log(err);
+        console.log('there are a total of: ', total.folders, ' folders and ', total.files, ' files');
+        console.log('the structure looks like: ', JSON.stringify(structure, null, 4));
+        response.send(structure);
+    });
+});
 
 module.exports = router;
