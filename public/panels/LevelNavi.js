@@ -1,5 +1,5 @@
 var LevelNavi = function (name) {
-    return div().addClass('levelNavi').css('margin','10px').css('perspective','150em').append(new NaviRow(name))
+    return div().addClass('levelNavi').css('margin','10px').css('perspective','50em').append(new NaviRow(name))
 };
 
 var NaviRow = function (name) {
@@ -20,7 +20,7 @@ var LevelFace = function () {
         .css('padding','0').css('transform-style','preserve-3d');
 
     this.level = div().css('position','absolute').addClass('face').css('background','rgba(0,0,0,0.25)')
-        .css('height','120px').css('width','120px').css({'transform':'rotateX(-90deg) translateZ(30px)'});
+        .css('height','120px').css('width','120px').css({'transform':'rotateX(-90deg) translateZ(30px)'}).css('transition','2s ease');
 
     return this.faceWindow.append(
         this.level

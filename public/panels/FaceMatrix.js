@@ -1,5 +1,5 @@
 var FaceMatrix = function(faces){
-    this.faceMatrix = div().addClass('faceMatrix').css('perspective','150em');
+    this.faceMatrix = div().addClass('faceMatrix').css('perspective','100em');
 
     this.faceMatrix.append(new FacePanel(faces));
 
