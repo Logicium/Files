@@ -1,5 +1,5 @@
 var fs = require('fs');
-var path = require('path');
+var mkdirp = require('mkdirp');
 var LinvoDB = require("linvodb3");
 LinvoDB.dbPath = process.cwd();
 var Databases = {};
@@ -12,21 +12,24 @@ Databases = {
 
 //Initialize first user for Users Database:
 
-var adminFolder = new Folder();
-adminFolder.setName('admin-'+Date.now());
-adminFolder.writeAllToDisk();
+var adminFolder = './server/folders/'+'admin-'+Date.now();
 
 var adminUser = {
     username:'admin',
     password:'superSecret',
     loginToken:'',
-    userFolder: adminFolder.path.combine()
+    userFolder: adminFolder
 };
 
-Databases.Users.insert(adminUser, function (err, newDoc) {
-    console.log(newDoc);
-    console.log('Admin user added.');
+mkdirp(adminFolder, function (err) {
+    if (err) console.error(err);
+    else{
+        console.log('Admin folder created');
+        Databases.Users.insert(adminUser, function (err, newDoc) {
+            console.log(newDoc);
+            console.log('Admin user added.');
+        });
+    }
 });
-
 
 module.exports = Databases;
