@@ -10,15 +10,19 @@ var Databases = require('./Databases');
 
 router.post('/list',function(request,response){
     console.log(request.body);
-    Databases.Users.findOne({loginToken: request.body.token.substring(0,12)},function(err, doc) {
+    Databases.Users.findOne({loginToken: request.body.token},function(err, doc) {
         var basepath = doc.userFolder;
         console.log(doc);
         if (doc) {
             DirectoryStructureJSON.getStructure(fs, basepath, function (err, structure, total) {
                 if (err) console.log(err);
-                console.log('there are a total of: ', total.folders, ' folders and ', total.files, ' files');
-                console.log('the structure looks like: ', JSON.stringify(structure, null, 4));
-                response.send(structure);
+                if(structure instanceof Array && structure.length === 0){
+                    response.send({type:'folder','name': ucfirst(doc.username)+'\'s Home folder',children:[],totals:{folders:0,files:0}});
+                }else{
+                    console.log('there are a total of: ', total.folders, ' folders and ', total.files, ' files');
+                    console.log('the structure looks like: ', JSON.stringify(structure, null, 4));
+                    response.send(structure);
+                }
             });
         }
         else{
@@ -27,8 +31,12 @@ router.post('/list',function(request,response){
     });
 
     //var basepath = './server/folders/'+request.body.userFolder;
-
 });
+
+function ucfirst(str) {
+    var firstLetter = str.substr(0, 1);
+    return firstLetter.toUpperCase() + str.substr(1);
+}
 
 router.post('/login', function (request, response) {
 
@@ -39,8 +47,8 @@ router.post('/login', function (request, response) {
     var Users = Databases.Users.findOne({username:incomingUser.username,password:incomingUser.password},function(err,doc){
         console.log(doc);
         if (doc) {
-            var token = jwt.sign({U:incomingUser.username}, 'superSecret', {expiresIn: '10h'}); //expires in 24 hours
-            doc.loginToken = token.substring(0,12);
+            var token = jwt.sign({U:incomingUser.username}, 'superSecret', {expiresIn: '10h'});
+            doc.loginToken = token;
             doc.save(function (err) {});
             response.send({message: 'Login Success!', data:doc, success: true, token: token});
         }

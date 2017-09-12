@@ -3,8 +3,8 @@ var text = function(string,color,size){return div().text(string).css('color',col
 
 var panel = function(){return div().addClass('contentPanel animated fadeIn').css('overflow','auto').css('padding','100px').css('padding-top','25px');}
 
-var highlightText = function(text){return $('<span style=\"background: rgba(0,0,0,0.71);\">&nbsp;'+text+'</span>').css('color','white');};
-var highlightTextLight = function(text){return $('<span style=\"background:'+transparentWhiteHeavy()+'\">&nbsp;'+text+'</span>');};
+var highlightText = function(text){return $('<span style=\"background: rgba(0,0,0,0.71);\">&nbsp;'+text+'&nbsp;</span>').css('color','white');};
+var highlightTextLight = function(text){return $('<span style=\"background:'+transparentWhiteHeavy()+'\">&nbsp;'+text+'&nbsp;</span>');};
 
 
 var navDiv = function(){

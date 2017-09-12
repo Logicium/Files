@@ -8,7 +8,7 @@ var FaceMatrix = function(faces){
 
 var FacePanel = function (FaceData) {
 
-    this.facePanel = div().css('position','absolute').addClass('facePanel').css('background',transparentWhiteHeavy())
+    this.facePanel = div().css('position','absolute').addClass('facePanel').css('background',transparentWhite())
         .css('padding','10px').css('margin','10px').css('min-height','600px').css('width','95%');
     this.buttonClick = function(formInputs){
 
@@ -27,15 +27,16 @@ var FacePanel = function (FaceData) {
     this.sortButton = buttonCol('Sort','sync',3).css('color','white');
     this.orderButton = buttonCol('Ascending','arrow-up',3).css('color','white');
     this.toolBar = row();
-    this.items = div();
+    this.directories = div();
+    this.files = row();
 
     for(var index in FaceData.children){
 
         if(FaceData.children[index].type === 'folder'){
-            this.items.append(new DirectoryCard(FaceData.children[index]))
+            this.directories.append(new DirectoryCard(FaceData.children[index]))
         }
         else if(FaceData.children[index].type === 'file'){
-            this.items.append(new FileCard(FaceData.children[index]))
+            this.files.append(new FileCard(FaceData.children[index]))
         }
     }
 
@@ -47,6 +48,7 @@ var FacePanel = function (FaceData) {
             this.sortButton,
             this.orderButton
         ),
-        this.items
+        this.directories,
+        this.files
     )
 };

@@ -10,45 +10,54 @@ var DirectoryCard = function(directoryData){
 
         .click(function(){
 
-            var index =0;
-            var oldRects=[];
-            $.each($('.levelNavi'),function(){
-                //get the old position rect
-                oldRects[index++] = $(this).get(0).getBoundingClientRect();
-            });
-            console.log(oldRects);
-            //add the new one temporarily and save the group.
-            $('.levelNavi').append(new NaviRow(directoryData.name));
-            index=0;
-            var newLevels = $('.levelNavi');
-            $.each(newLevels,function(){
-                //animate from old to new.
-                var newRect = $(this).get(0).getBoundingClientRect();
-                //instantly set to Old
-                var oldRect = oldRects[index++];
-                var id = setInterval(frame, 5);
-                function frame() {
-                    if (oldRect == newRect) {
-                        clearInterval(id);
-                    } else {
-                        oldRect++;
-                        $(this).css('top',oldRect.top+'px').css('bottom',oldRect.bottom+'px').css('left',oldRect.left+'px').css('right',oldRect.right+'px');
-                    }
-                }
-
+            $.keyframe.define({
+                name:'expand-height',
+                from:{'height':'0px',opacity:'0'},
+                to:{'height':'200px',opacity:'1'}
             });
 
+            $.keyframe.define({
+                name:'fade-in',
+                from:{opacity:'0'},
+                to:{opacity:'1'}
+            });
 
+            $.keyframe.define({
+                name:'new-panel',
+                from:{transform:'translateY(50px) translateZ(100px)',opacity:'0'},
+                to:{transform:'translateY(0px) translateZ(0px)',opacity:'1'}
+            });
+
+            $.keyframe.define({
+                name:'new-level',
+                from:{transform:'rotateX(-80deg) translateZ(0px)',opacity:'0'},
+                to:{transform:'rotateX(-90deg) translateZ(30px)',opacity:'1'}
+            });
+            var nr = new NaviRow(directoryData.name);
+            $('.levelNavi').append(nr.playKeyframe(
+                {name:'expand-height',duration:'1s',timingFunction:'ease'},function(){
+
+                    $.each($('.naviRow'),function () {
+                        $(this).resetKeyframe(function(){});
+                        setTimeout(function(){$($(this).find('.levelFace')).resetKeyframe(function(){});},1000);
+                    });
+                    $('.levelFace:last').playKeyframe(
+                        {name:'new-level',duration:'1s',timingFunction:'ease'}
+                    );
+            }));
 
 
 
             var transformValue = 0;
             $.each( $('.facePanel') ,function(elem){
                 transformValue = transformValue - 1500;
-               $(this).css('z-index',transformValue).css('transition','2s ease').css({'transform':'translateY(300px) translateZ('+transformValue+'px)'});
+               $(this).css('z-index',transformValue).css('transition','2s ease').css('animation-delay',transformValue/10+'ms')
+                   .css({'transform':'translateY(300px) translateZ('+transformValue+'px)'});
             });
 
-            $('.faceMatrix').prepend(new FacePanel(directoryData));
+            $('.faceMatrix').prepend(new FacePanel(directoryData).playKeyframe({
+                name:'new-panel',duration:'1s',timingFunction:'ease',complete:function(){$(this).resetKeyframe()}
+            }));
 
         });
 
