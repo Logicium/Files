@@ -66,7 +66,7 @@ router.post('/uploadFiles',function(request,response){
                 for(var index in request.body.files){
 
                     var fileName = request.body.files[index].name;
-                    console.log('FileName '+fileName);
+                    console.log('File '+ request.body.files[index]);
 
                     fs.move('./server/temp/' + fileName, dir + '/' + fileName, function (err) {
                         if (err) {
