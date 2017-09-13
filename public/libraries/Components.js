@@ -6,6 +6,8 @@ var panel = function(){return div().addClass('contentPanel animated fadeIn').css
 var highlightText = function(text){return $('<span style=\"background: rgba(0,0,0,0.71);\">&nbsp;'+text+'&nbsp;</span>').css('color','white');};
 var highlightTextLight = function(text){return $('<span style=\"background:'+transparentWhiteHeavy()+'\">&nbsp;'+text+'&nbsp;</span>');};
 
+var dimensionalPanel = div().css('position','absolute').addClass('facePanel').css('background',transparentWhite())
+    .css('padding','10px').css('margin','10px').css('min-height','600px').css('width','95%');
 
 var navDiv = function(){
     return col(2).addClass('hvr-underline-from-center').css('font-size','16px').css('line-height','50px')

@@ -58,6 +58,24 @@ router.post('/login', function (request, response) {
     });
 });
 
+router.post('/image',function(request,response){
+    console.log(request.body);
+    Databases.Users.findOne({loginToken: request.body.token},function(err, doc) {
+        //var basepath = doc.userFolder;
+        console.log(doc);
+        if (doc) { //also check if that file is shared with user
+            console.log(request.body.path);
+            var img = fs.readFileSync(request.body.path);
+            var img64 = new Buffer(img).toString('base64');
+            //console.log('Img64: '+img64);
+            response.writeHead(200, {'Content-Type': 'image/'+(request.body.extension).slice(1),'Content-Length': img64.length});
+            response.end(img64);
+        }
+        else{
+            response.send({message: 'User not Found', type: 'error'});
+        }
+    });
+});
 
 router.use(function(req, res, next) {
     console.log(req.file);
@@ -88,6 +106,9 @@ router.use(function(req, res, next) {
         });
     }
 });
+
+
+
 
 router.post('/add',function(request,response){
     console.log("Add settings request: ");

@@ -9,11 +9,16 @@ var DirectoryCard = function(directoryData){
         .css('background-position','50% 55%').css('cursor','pointer').css('color','black')
 
         .click(function(){
-
             $.keyframe.define({
                 name:'expand-height',
                 from:{'height':'0px',opacity:'0'},
                 to:{'height':'200px',opacity:'1'}
+            });
+
+            $.keyframe.define({
+                name:'retract-height',
+                from:{'height':'200px',opacity:'1'},
+                to:{'height':'0px',opacity:'0'}
             });
 
             $.keyframe.define({
@@ -46,8 +51,6 @@ var DirectoryCard = function(directoryData){
                     );
             }));
 
-
-
             var transformValue = 0;
             $.each( $('.facePanel') ,function(elem){
                 transformValue = transformValue - 1500;
@@ -77,8 +80,8 @@ var DirectoryCard = function(directoryData){
         var fileCount =  directoryData.totals.files;
         var total = folderCount + fileCount;
 
-        this.directoryPercent = buttonCol().width((folderCount/total)*100+'%').text(folderCount+' Folders');
-        this.filePercent = buttonCol().width((fileCount/total)*100+'%').text(fileCount+' Files');
+        this.directoryPercent = buttonCol().css('min-width','10%').css('max-width','90%').width((folderCount/total)*100+'%').text(folderCount+' Folders');
+        this.filePercent = buttonCol().css('min-width','10%').css('max-width','90%').width((fileCount/total)*100+'%').text(fileCount+' Files');
 
         this.statsRow.append(
             this.directoryPercent,

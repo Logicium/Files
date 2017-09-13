@@ -22,8 +22,8 @@ var FacePanel = function (FaceData) {
 
     };
     this.searchBar = input('Search '+FaceData.children.length+' items in '+FaceData.name);
-    this.newFolderButton = buttonCol('New Folder','folder',3).removeClass('cta').addClass('ghost').css('color',transparentBlack());
-    this.newFileButton = buttonCol('New File','file',3).removeClass('cta').addClass('ghost').css('color',transparentBlack());
+    this.newFolderButton = buttonCol('New Folder','folder',3).removeClass('cta').addClass('rev').css('color',transparentBlack());
+    this.newFileButton = buttonCol('New File','file',3).removeClass('cta').addClass('rev').css('color',transparentBlack());
     this.sortButton = buttonCol('Sort','sync',3).css('color','white');
     this.orderButton = buttonCol('Ascending','arrow-up',3).css('color','white');
     this.toolBar = row();

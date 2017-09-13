@@ -24,28 +24,41 @@ var NaviRow = function (name) {
     });
 };
 
+$.keyframe.define({
+    name:'retract-height',
+    from:{'height':'200px',opacity:'1'},
+    to:{'height':'0px',opacity:'0'}
+});
+
 function dequeue(queueIndex,total){
+    if(total - (queueIndex+1) >= 0){
 
-    //Remove one Level Navi by retracting the height of the parent, then in the callback, remove the element.
-    $('.naviRow:last').fadeOut(300, function() { $(this).remove(); });
+        //Remove one Level Navi by retracting the height of the parent, then in the callback, remove the element.
+        $('.naviRow:last').playKeyframe({
+            name:'retract-height',duration:'1s',timingFunction:'ease',complete:function(){
+                //$('.naviRow:last').remove();
+            }
+        });
 
-    var transformValue = -($('.facePanel').length*1500-1500);
-    var reverse = $('.facePanel').get();
-    console.log(reverse);
-    for(var i = reverse.length-1;i>=0;--i){
-        console.log(transformValue,i);
-        transformValue = transformValue + 1500;
-        $($('.facePanel')[i]).css('z-index',transformValue).css('transition','2s ease')
-            .css({'transform':'translateY(0px) translateZ('+transformValue+'px)'});
-    }
-    //Remove One facepanel, in the callback, bring all remaining face panels forward.
-    $('.facePanel:first').fadeOut(500, function() {
-        $(this).remove();
-        console.log((total - (queueIndex+1) != 0),total - (queueIndex+1));
-        if( total - (queueIndex+1) != 0){
-            dequeue(++queueIndex,total)
+        var transformValue = -($('.facePanel').length*1500-1500);
+        var reverse = $('.facePanel').get();
+        console.log(reverse);
+        for(var i = reverse.length-1;i>=0;--i){
+            console.log(transformValue,i);
+            transformValue = transformValue + 1500;
+            $($('.facePanel')[i]).css('z-index',transformValue).css('transition','2s ease')
+                .css({'transform':'translateY(0px) translateZ('+transformValue+'px)'});
         }
-    });
+        //Remove One facepanel, in the callback, bring all remaining face panels forward.
+        $('.facePanel:first').fadeOut(750, function() {
+            $(this).remove();
+            $('.naviRow:last').remove();
+            console.log((total - (queueIndex+1) >= 0),total - (queueIndex+1));
+            if( total - (queueIndex+1) >= 0){
+                dequeue(++queueIndex,total)
+            }
+        });
+    }
 }
 
 var LevelFace = function () {
