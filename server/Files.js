@@ -1,5 +1,5 @@
 var express = require('express');
-var fs = require('fs');
+var fs = require('fs-extra');
 var router = express.Router();
 var multer  =   require('multer');
 var path = require('path');
@@ -37,6 +37,51 @@ function ucfirst(str) {
     var firstLetter = str.substr(0, 1);
     return firstLetter.toUpperCase() + str.substr(1);
 }
+
+router.post('/uploadFiles',function(request,response){
+
+    Databases.Users.findOne({loginToken:request.body.token},function (err, doc) {
+        if(doc){
+            var storage = multer.diskStorage({
+                destination: function (req, file, callback) {
+                    callback(null, './server/temp');
+                },
+                filename: function (req, file, callback) {
+                    callback(null, file.originalname);
+                }
+            });
+            var upload = multer({ storage : storage}).array('files');
+
+            upload(request,response,function(err) {
+                if(err) {
+                    return response.end(JSON.stringify({message:"Error uploading file.",type:'error'}));
+                }
+
+                //var parentFolderPath = request.body.path;
+                console.log(request.body);
+                console.log(request.body.files);
+
+                var dir = request.body.path;
+
+                for(var index in request.body.files){
+
+                    var fileName = request.body.files[index].name;
+                    console.log('FileName '+fileName);
+
+                    fs.move('./server/temp/' + fileName, dir + '/' + fileName, function (err) {
+                        if (err) {
+                            return console.error(err);
+                        }
+                    });
+                }
+                response.end(JSON.stringify({message:"File is Uploaded",filename:request.files.filename,type:'success'}));
+            });
+        }
+        else{
+            response.send({message: 'User not Found', type: 'error'})
+        }
+    });
+});
 
 router.post('/login', function (request, response) {
 
@@ -107,9 +152,6 @@ router.use(function(req, res, next) {
     }
 });
 
-
-
-
 router.post('/add',function(request,response){
     console.log("Add settings request: ");
     console.log(request.body);
@@ -119,24 +161,36 @@ router.post('/add',function(request,response){
     });
 });
 
-router.post('/update',function(request,response){
+router.post('/uploadFolder',function(request,response){
     console.log(request.body);
-    var parentName = request.body.parentTitle;
-    console.log(parentName);
-    var parentIndex = request.body.parentIndex;
-    var newConfig = JSON.parse(request.body.newConfig);
-    console.log(newConfig);
 
-    Databases.Users.findOne({name:parentName},function (err, doc) {
+    Databases.Users.findOne({loginToken:request.body.token},function (err, doc) {
+        if(doc){
+            var parentFolderPath = request.body.path;
+            var storage = multer.diskStorage({
+                destination: function (req, file, callback) {
+                    callback(null, './server'+parentFolderPath);
+                },
+                filename: function (req, file, callback) {
+                    callback(null, file.originalname);
+                }
+            });
+            var upload = multer({ storage : storage}).array('files');
 
-        console.log(JSON.stringify(doc));
-        doc.data = newConfig[parentIndex].data;
-        console.log('Logging doc');
-        doc.save(function (err) {});
-        response.send({message:'Successfully Updated',doc:doc});
+            upload(request,response,function(err) {
+                console.log(request.files);
+                if(err) {
+                    return response.end(JSON.stringify({message:"Error uploading file.",type:'error'}));
+                }
+                response.end(JSON.stringify({message:"File is Uploaded",filename:request.files.filename,type:'success'}));
+            });
+        }
+        else{
+            response.send({message: 'User not Found', type: 'error'})
+        }
     });
-
 });
+
 
 router.post('/find',function(request,response){
     console.log(request.body);

@@ -21,11 +21,70 @@ var FacePanel = function (FaceData) {
         }
 
     };
+
     this.searchBar = input('Search '+FaceData.children.length+' items in '+FaceData.name);
-    this.newFolderButton = buttonCol('New Folder','folder',3).removeClass('cta').addClass('rev').css('color',transparentBlack());
-    this.newFileButton = buttonCol('New File','file',3).removeClass('cta').addClass('rev').css('color',transparentBlack());
+
+    this.newFolderButton = buttonCol('Add Folders','folder',3).removeClass('cta').addClass('rev').css('color',transparentBlack()).click(function(){
+
+        var newfolderData = {name:'Folders'};
+
+        var nr = new NaviRow('New '+newfolderData.name);
+        $('.levelNavi').append(nr.playKeyframe(
+            {name:'expand-height',duration:'1s',timingFunction:'ease'},function(){
+                $.each($('.naviRow'),function () {
+                    $(this).resetKeyframe(function(){});
+                    setTimeout(function(){$($(this).find('.levelFace')).resetKeyframe(function(){});},1000);
+                });
+                $('.levelFace:last').playKeyframe(
+                    {name:'new-level',duration:'1s',timingFunction:'ease'}
+                );
+            }));
+
+        var transformValue = 0;
+        $.each( $('.facePanel') ,function(){
+            transformValue = transformValue - 1500;
+            $(this).css('z-index',transformValue).css('transition','2s ease').css('animation-delay',transformValue/10+'ms')
+                .css({'transform':'translateY(300px) translateZ('+transformValue+'px)'});
+        });
+
+        $('.faceMatrix').prepend(new NewFolder(newfolderData.name).playKeyframe({
+            name:'new-panel',duration:'1s',timingFunction:'ease',complete:function(){$(this).resetKeyframe()}
+        }));
+
+    });
+
+    this.newFileButton = buttonCol('Add Files','file',3).removeClass('cta').addClass('rev').css('color',transparentBlack()).click(function(){
+        var newData = {name:'Files'};
+
+        var nr = new NaviRow('New '+newData.name);
+        $('.levelNavi').append(nr.playKeyframe(
+            {name:'expand-height',duration:'1s',timingFunction:'ease'},function(){
+                $.each($('.naviRow'),function () {
+                    $(this).resetKeyframe(function(){});
+                    setTimeout(function(){$($(this).find('.levelFace')).resetKeyframe(function(){});},1000);
+                });
+                $('.levelFace:last').playKeyframe(
+                    {name:'new-level',duration:'1s',timingFunction:'ease'}
+                );
+            }));
+
+        var transformValue = 0;
+        $.each( $('.facePanel') ,function(){
+            transformValue = transformValue - 1500;
+            $(this).css('z-index',transformValue).css('transition','2s ease').css('animation-delay',transformValue/10+'ms')
+                .css({'transform':'translateY(300px) translateZ('+transformValue+'px)'});
+        });
+
+        $('.faceMatrix').prepend(new NewFile(newData.name).playKeyframe({
+            name:'new-panel',duration:'1s',timingFunction:'ease',complete:function(){$(this).resetKeyframe()}
+        }));
+
+    });
+
     this.sortButton = buttonCol('Sort','sync',3).css('color','white');
+
     this.orderButton = buttonCol('Ascending','arrow-up',3).css('color','white');
+
     this.toolBar = row();
     this.directories = div();
     this.files = row();

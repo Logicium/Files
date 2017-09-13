@@ -1,3 +1,33 @@
+$.keyframe.define({
+    name:'expand-height',
+    from:{'height':'0px',opacity:'0'},
+    to:{'height':'200px',opacity:'1'}
+});
+
+$.keyframe.define({
+    name:'retract-height',
+    from:{'height':'200px',opacity:'1'},
+    to:{'height':'0px',opacity:'0'}
+});
+
+$.keyframe.define({
+    name:'fade-in',
+    from:{opacity:'0'},
+    to:{opacity:'1'}
+});
+
+$.keyframe.define({
+    name:'new-panel',
+    from:{transform:'translateY(50px) translateZ(100px)',opacity:'0'},
+    to:{transform:'translateY(0px) translateZ(0px)',opacity:'1'}
+});
+
+$.keyframe.define({
+    name:'new-level',
+    from:{transform:'rotateX(-80deg) translateZ(0px)',opacity:'0'},
+    to:{transform:'rotateX(-90deg) translateZ(30px)',opacity:'1'}
+});
+
 var DirectoryCard = function(directoryData){
 
     var image = directoryData.image || 'public/images/bg5.jpg';
@@ -9,35 +39,7 @@ var DirectoryCard = function(directoryData){
         .css('background-position','50% 55%').css('cursor','pointer').css('color','black')
 
         .click(function(){
-            $.keyframe.define({
-                name:'expand-height',
-                from:{'height':'0px',opacity:'0'},
-                to:{'height':'200px',opacity:'1'}
-            });
 
-            $.keyframe.define({
-                name:'retract-height',
-                from:{'height':'200px',opacity:'1'},
-                to:{'height':'0px',opacity:'0'}
-            });
-
-            $.keyframe.define({
-                name:'fade-in',
-                from:{opacity:'0'},
-                to:{opacity:'1'}
-            });
-
-            $.keyframe.define({
-                name:'new-panel',
-                from:{transform:'translateY(50px) translateZ(100px)',opacity:'0'},
-                to:{transform:'translateY(0px) translateZ(0px)',opacity:'1'}
-            });
-
-            $.keyframe.define({
-                name:'new-level',
-                from:{transform:'rotateX(-80deg) translateZ(0px)',opacity:'0'},
-                to:{transform:'rotateX(-90deg) translateZ(30px)',opacity:'1'}
-            });
             var nr = new NaviRow(directoryData.name);
             $('.levelNavi').append(nr.playKeyframe(
                 {name:'expand-height',duration:'1s',timingFunction:'ease'},function(){
@@ -52,7 +54,7 @@ var DirectoryCard = function(directoryData){
             }));
 
             var transformValue = 0;
-            $.each( $('.facePanel') ,function(elem){
+            $.each( $('.facePanel') ,function(){
                 transformValue = transformValue - 1500;
                $(this).css('z-index',transformValue).css('transition','2s ease').css('animation-delay',transformValue/10+'ms')
                    .css({'transform':'translateY(300px) translateZ('+transformValue+'px)'});

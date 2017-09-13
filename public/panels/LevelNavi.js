@@ -10,7 +10,7 @@ var NaviRow = function (name) {
 
     return row().addClass('naviRow').css(click()).height('200px').css('transform-style','preserve-3d').css('background-color',transparentWhite()).append(
         this.dimensionalCol.append(this.dimensionalFace),
-        this.nameCol.append( div().css('padding-top','75px').css('margin','0 auto').text(name) )
+        this.nameCol.append( div().addClass('naviName').css('padding-top','75px').css('margin','0 auto').text(name) )
     ).hover(
         function(){$(this).animate({'background-color':transparentBlack(),'color':'white'},300);},
         function () {$(this).animate({'background-color':transparentWhite(),'color':'black'},300)}

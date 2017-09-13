@@ -1,10 +1,9 @@
 var FileCard = function (fileData) {
 
-    this.fileCard = col(3).removeClass('text-center').addClass('text-left').height('200px')
-        .css('padding-right','10px').css('padding-left','10px').css('padding-top','25px');
+    this.fileCard = col(3).removeClass('text-center').addClass('text-left').height('200px').css('padding','5px').css('padding-top','25px');
     this.name = highlightText(fileData.name).css('font-size','28px').css('font-family','Open Sans Condensed');
     this.type = highlightText('Type | '+ (fileData.extension || fileData.type)).css('font-size','20px').css('font-family','Open Sans Condensed');
-    this.infoContainer  = div()
+    this.infoContainer  = div();
     var self=this;
     if(/(jpg|gif|png|JPG|GIF|PNG|JPEG|jpeg)$/.test(fileData.extension)){
         $.post('/files/image',{path:fileData.path,extension:fileData.extension,token:Token},function(data){
