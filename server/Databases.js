@@ -12,12 +12,14 @@ Databases = {
 
 //Initialize first user for Users Database:
 
-var adminFolder = './server/folders/'+'admin-'+Date.now();
 
+var now = Date.now();
+var adminFolder = './server/folders/'+'admin-'+now;
 var adminUser = {
     username:'admin',
     password:'superSecret',
     loginToken:'',
+    created: now,
     userFolder: adminFolder
 };
 

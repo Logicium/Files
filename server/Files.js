@@ -17,7 +17,7 @@ router.post('/list',function(request,response){
             DirectoryStructureJSON.getStructure(fs, basepath, function (err, structure, total) {
                 if (err) console.log(err);
                 if(structure instanceof Array && structure.length === 0){
-                    response.send({type:'folder',name: doc.userFolder,children:[],totals:{folders:0,files:0}});
+                    response.send({type:'folder',name: doc.name,children:[],totals:{folders:0,files:0}});
                 }else{
                     console.log('there are a total of: ', total.folders, ' folders and ', total.files, ' files');
                     console.log('the structure looks like: ', JSON.stringify(structure, null, 4));
