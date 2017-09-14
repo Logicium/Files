@@ -21,7 +21,7 @@ var NewFile = function (name) {
 
         formData.append('token',Token);
         formData.append('path',parentFolderPath);
-
+        console.log(parentFolderPath);
         $.ajax({
             url:'/files/uploadFiles',
             type: 'POST',

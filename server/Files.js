@@ -57,7 +57,6 @@ router.post('/uploadFiles',function(request,response){
                     return response.end(JSON.stringify({message:"Error uploading file.",type:'error',err:err}));
                 }
 
-                //var parentFolderPath = request.body.path;
                 console.log(request.body);
                 console.log(request.files);
 
