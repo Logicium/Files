@@ -8,17 +8,17 @@ var NewFolder = function (name) {
     this.upload =  button('Upload '+name).css('font-size','18px').css('margin','0').css('max-width','100%').removeClass('cta').addClass('rev text-center').width('100%').click(function(){
         self.uploadInput.click();
     });
+
     this.or = div().width('100%').addClass('text-center').append(highlightText('Or')).css('font-size','26px').css('padding','20px');
     this.submit = button('Create new '+name).css('font-size','18px').css('margin','0').css('max-width','100%').addClass('cta text-center').width('100%').click(function(){
         var inputs = $('input');
         var inputObject = {};
         $.each(inputs,function () { inputObject[ $(this).attr('placeholder') ] = $(this).val(); });
 
-        // $.post('/files/update',data,function (data) {
-        //     swal.resetDefaults();
-        //     swal({title:data.message,type:'success',timer:2000});
-        //      //Dequeue panel
-        // });
+        $.post('/files/newFolder',{token:Token,path:inputObject[0]},function (data) {
+            swal.resetDefaults();
+            swal({title:data.message,type:data.type,timer:2000});
+        });
 
     });
 

@@ -38,6 +38,16 @@ function ucfirst(str) {
     return firstLetter.toUpperCase() + str.substr(1);
 }
 
+router.post('/newFolder',function (request,response) {
+    Databases.Users.findOne({loginToken:request.body.token},function (err, doc) {
+        if(doc){mkdirp(request.body.path, function (err) {
+                if (err) console.error(err)
+                response.send({message: 'Folder created', type: 'success'})
+            });
+        }
+    });
+});
+
 router.post('/uploadFiles',function(request,response){
 
     Databases.Users.findOne({loginToken:request.body.token},function (err, doc) {
