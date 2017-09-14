@@ -1,7 +1,7 @@
 var FileCard = function (fileData) {
 
     this.fileCard = col(3).removeClass('text-center').addClass('text-left').css('padding','5px').css('padding-top','25px');
-    this.name = highlightText(fileData.name.trunc(20)).css('text-overflow','ellipsis').css('white-space','pre-line').css('word-break','break-all').css('font-size','22px').css('font-family','Open Sans Condensed');
+    this.name = highlightText(fileData.name.trunc(25)).css('text-overflow','ellipsis').css('white-space','pre-line').css('word-break','break-all').css('font-size','22px').css('font-family','Open Sans Condensed');
     this.type = highlightTextLight('Type | '+ (fileData.extension || fileData.type)).css('font-size','16px').css('font-family','Open Sans Condensed');
     this.infoContainer  = div().height('200px');
     var self=this;
