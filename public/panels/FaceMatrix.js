@@ -22,11 +22,13 @@ var FacePanel = function (FaceData) {
 
     };
 
+    this.panelTitleBar = panelTitle(FaceData.name);
+
     this.searchBar = input('Search '+FaceData.children.length+' items in '+FaceData.name);
 
-    this.newFolderButton = buttonCol('Add Folders','folder',3).removeClass('cta').addClass('rev').css('color',transparentBlack()).click(function(){
+    this.newFolderButton = buttonCol('Add Folder','folder',3).removeClass('cta').addClass('rev').css('color',transparentBlack()).click(function(){
 
-        var newfolderData = {name:'Folders'};
+        var newfolderData = {name:'Folder'};
 
         var nr = new NaviRow('New '+newfolderData.name);
         $('.levelNavi').append(nr.playKeyframe(
@@ -100,6 +102,7 @@ var FacePanel = function (FaceData) {
     }
 
     return this.facePanel.append(
+        this.panelTitleBar,
         this.searchBar,
         this.toolBar.append(
             this.newFolderButton,

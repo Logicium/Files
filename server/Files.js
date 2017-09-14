@@ -50,25 +50,25 @@ router.post('/uploadFiles',function(request,response){
                     callback(null, file.originalname);
                 }
             });
-            var upload = multer({ storage : storage}).array('files');
+            var upload = multer({ storage : storage}).array('file');
 
             upload(request,response,function(err) {
                 if(err) {
-                    return response.end(JSON.stringify({message:"Error uploading file.",type:'error'}));
+                    return response.end(JSON.stringify({message:"Error uploading file.",type:'error',err:err}));
                 }
 
                 //var parentFolderPath = request.body.path;
                 console.log(request.body);
-                console.log(request.body.files);
+                console.log(request.files);
 
                 var dir = request.body.path;
 
-                for(var index in request.body.files){
+                for(var i in request.files){
 
-                    var fileName = request.body.files[index].name;
-                    console.log('File '+ request.body.files[index]);
+                    var fileName = request.files[i].filename;
+                    console.log('File '+ fileName);
 
-                    fs.move('./server/temp/' + fileName, dir + '/' + fileName, function (err) {
+                    fs.move('./server/temp/' + fileName, './server/folders' + dir + '/' + fileName, function (err) {
                         if (err) {
                             return console.error(err);
                         }
