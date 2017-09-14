@@ -11,11 +11,22 @@ var NewFolder = function (name) {
 
     this.or = div().width('100%').addClass('text-center').append(highlightText('Or')).css('font-size','26px').css('padding','20px');
     this.submit = button('Create new '+name).css('font-size','18px').css('margin','0').css('max-width','100%').addClass('cta text-center').width('100%').click(function(){
+
         var inputs = $('input');
         var inputObject = {};
         $.each(inputs,function () { inputObject[ $(this).attr('placeholder') ] = $(this).val(); });
 
-        $.post('/files/newFolder',{token:Token,path:inputObject[0]},function (data) {
+
+        var parentFolderPath = '';
+        $.each($('.naviName'),function(){
+            var name = $(this).text();
+            console.log(name);
+            parentFolderPath = parentFolderPath+'/'+name;
+        });
+        parentFolderPath = parentFolderPath.substring(0,parentFolderPath.lastIndexOf('/New Folder')) + '/'+inputObject.Name;
+        console.log(parentFolderPath);
+
+        $.post('/files/newFolder',{token:Token,path:parentFolderPath},function (data) {
             swal.resetDefaults();
             swal({title:data.message,type:data.type,timer:2000});
         });
