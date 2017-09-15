@@ -1,0 +1,3 @@
+var CodeEditor = function () {
+
+};
