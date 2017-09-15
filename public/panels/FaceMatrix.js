@@ -84,7 +84,6 @@ var FacePanel = function (FaceData) {
     });
 
     this.sortButton = buttonCol('Sort','sync',3).css('color','white');
-
     this.orderButton = buttonCol('Ascending','arrow-up',3).css('color','white');
 
     this.toolBar = row();

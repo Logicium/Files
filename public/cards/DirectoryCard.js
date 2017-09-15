@@ -29,9 +29,13 @@ $.keyframe.define({
 });
 
 var DirectoryCard = function(directoryData){
-
-    var image = directoryData.image || 'public/images/bg5.jpg';
-
+    var self = this;
+    var images = [];
+    for(var index in directoryData.children){
+        var c = directoryData.children[index];
+        if( c.type == 'file' && /(jpg|gif|png|JPG|GIF|PNG|JPEG|jpeg)$/.test(c.extension) ) images.push(c)
+    }
+    var image = directoryData.image || 'public/images/bg4.jpg';
     this.directoryCard = div().css('margin-top','25px');
     this.directoryBanner = gradientImage(image,transparent(),transparentWhite()).append(
         row().append( col(3).append(highlightTextLight(directoryData.name)),col(6),col(3).append(highlightTextLight(directoryData.children.length+' Items')) )
@@ -43,7 +47,6 @@ var DirectoryCard = function(directoryData){
             var nr = new NaviRow(directoryData.name);
             $('.levelNavi').append(nr.playKeyframe(
                 {name:'expand-height',duration:'1s',timingFunction:'ease'},function(){
-
                     $.each($('.naviRow'),function () {
                         $(this).resetKeyframe(function(){});
                         setTimeout(function(){$($(this).find('.levelFace')).resetKeyframe(function(){});},1000);
@@ -66,13 +69,6 @@ var DirectoryCard = function(directoryData){
 
         });
 
-    var self = this;
-    var images = [];
-    for(var index in directoryData.children){
-        var c = directoryData.children[index];
-        if( c.type == 'file' && /(jpg|gif|png|JPG|GIF|PNG|JPEG|jpeg)$/.test(c.extension) ) images.push(c)
-    }
-
     if(images.length!=0){
         var deferred = [];
         for(var index in images){
@@ -87,34 +83,35 @@ var DirectoryCard = function(directoryData){
         var now = Date.now();
         var keyframeObject = {name:'hover-slideshow-'+now};
         $.when.apply($, deferred).then(function(){
-            // Do your success stuff
             $.each(arguments,function(i,val){
-                console.log(i,images.length,val);
-                var unitPercent = ((1)/images.length)*100; //1,2,50% unit
-                var percent = ((i)/images.length)*100; //1,2, 50% local
-                var quarter = (unitPercent)/4; //
-                console.log(((i+1)/images.length)+'p%',percent+'%',quarter);
-                if(i==0) keyframeObject['0%']={'background-image':'url(data:image/jpg;base64,'+val[0]+')',opacity:'0'};
-                keyframeObject[(percent+(quarter))+'%']={'background-image':'url(data:image/jpg;base64,'+val[0]+')',opacity:'1'};
-                keyframeObject[(percent+(quarter*2))+'%']={'background-image':'url(data:image/jpg;base64,'+val[0]+')',opacity:'1'};
-                keyframeObject[(percent+(quarter*3))+'%']={'background-image':'url(data:image/jpg;base64,'+val[0]+')',opacity:'1'};
-                keyframeObject[(percent+(quarter*4))+'%']={'background-image':'url(data:image/jpg;base64,'+val[0]+')',opacity:'1'};
+                console.log('i '+i,arguments,'imgs '+images.length);
+                var percent = ((i+1)/images.length)*100;
+
+                if(images.length == 1 && i==0){
+                    self.directoryBanner.css('background-image','url(data:image/jpg;base64,'+val+')');
+                    keyframeObject['0%']={'background-image':'url(data:image/jpg;base64,'+val+')',opacity:'1'};
+                    keyframeObject[(percent)+'%']={'background-image':'url(data:image/jpg;base64,'+val+')',opacity:'1'};
+                    return false;
+                }else if(i==0){
+                    self.directoryBanner.css('background-image','url(data:image/jpg;base64,'+val[0]+')');
+                    keyframeObject['0%']={'background-image':'url(data:image/jpg;base64,'+val[0]+')',opacity:'1'};
+                }
+
+                keyframeObject[(percent)+'%']={'background-image':'url(data:image/jpg;base64,'+val[0]+')',opacity:'1'};
             });
+
+            console.log(keyframeObject);
+            $.keyframe.define(keyframeObject);
+            self.directoryBanner.hover(
+                function(){
+                    $(self.directoryBanner).playKeyframe({name:'hover-slideshow-'+now,duration:images.length*2000+'ms',iterationCount:'infinite'})
+                },
+                function(){
+                    $(self.directoryBanner).resetKeyframe()
+                }
+            );
         });
-
-        this.directoryBanner.hover(
-            function(){
-                console.log(keyframeObject);
-                $.keyframe.define(keyframeObject);
-                $(self.directoryBanner).playKeyframe({name:'hover-slideshow-'+now,duration:images.length*2000+'ms',iterationCount:'infinite'})
-            },
-            function(){
-                $(self.directoryBanner).resetKeyframe()
-            }
-        );
     }
-
-
 
     this.statsRow = row();
 

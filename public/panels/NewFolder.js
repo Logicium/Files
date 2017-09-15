@@ -2,9 +2,43 @@ var NewFolder = function (name) {
 
     var prototype = {Name:''};
     var self = this;
-    this.newFilePanel = dimensionalPanel();
+    this.viewFilePanel = dimensionalPanel();
     this.panelTitleBar = panelTitle('Add '+name);
-    this.uploadInput = input('Folder','file').css('display','none').attr('webkitdirectory','webkitdirectory').attr('multiple','multiple');
+
+    this.uploadInput = input('Folder','file').css('display','none').attr('webkitdirectory','webkitdirectory').attr('multiple','multiple').change(function(){
+        var formData = new FormData();
+        var inputVal = $(this).get(0).files;
+        for(var i in inputVal){
+            formData.append('file',inputVal[i]);
+        }
+
+        var parentFolderPath = '';
+        $.each($('.naviName'),function(){
+            var name = $(this).text();
+            parentFolderPath = parentFolderPath+'/'+name;
+        });
+        var newFolderName = inputVal[0].webkitRelativePath.split('/')[0];
+        parentFolderPath = parentFolderPath.substring(0,parentFolderPath.lastIndexOf('/New Folder')) + '/'+newFolderName;
+        formData.append('token',Token);
+        formData.append('path',parentFolderPath);
+        console.log(parentFolderPath);
+        $.post('/files/newFolder',{token:Token,path:parentFolderPath},function(data){
+            $.ajax({
+                url:'/files/uploadFiles',
+                type: 'POST',
+                data:formData,
+                processData: false,
+                contentType: false,
+                success:function(data){
+                    swal.resetDefaults();
+                    swal({title:JSON.parse(data).message,text:JSON.stringify(JSON.parse(data).err),type:JSON.parse(data).type});
+
+                }
+            });
+        });
+
+    });
+
     this.upload =  button('Upload '+name).css('font-size','18px').css('margin','0').css('max-width','100%').removeClass('cta').addClass('rev text-center').width('100%').click(function(){
         self.uploadInput.click();
     });
@@ -15,7 +49,6 @@ var NewFolder = function (name) {
         var inputs = $('input');
         var inputObject = {};
         $.each(inputs,function () { inputObject[ $(this).attr('placeholder') ] = $(this).val(); });
-
 
         var parentFolderPath = '';
         $.each($('.naviName'),function(){
@@ -39,7 +72,7 @@ var NewFolder = function (name) {
         this.inputs.append(new input(k))
     }
 
-    return this.newFilePanel.append(
+    return this.viewFilePanel.append(
         this.panelTitleBar,
         this.upload,
         this.uploadInput,

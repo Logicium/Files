@@ -41,7 +41,8 @@ function ucfirst(str) {
 
 router.post('/newFolder',function (request,response) {
     Databases.Users.findOne({loginToken:request.body.token},function (err, doc) {
-        if(doc){mkdirp('./server/folders'+request.body.path, function (err) {
+        if(doc){
+            mkdirp('./server/folders'+request.body.path, function (err) {
                 if (err) console.error(err)
                 response.send({message: 'Folder created', type: 'success'})
             });

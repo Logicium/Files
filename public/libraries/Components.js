@@ -20,9 +20,17 @@ var col = function(colNum){
     return  div().addClass('col-xs-'+colNum).addClass('text-center');
 };
 
-var siteBar = function (name) {
+var siteBar = function (name,buttonName,click) {
+    buttonName = buttonName || 'Logout';
+    click = click || function(){
+        sessionStorage.setItem('token',null);
+        sessionStorage.setItem('folder',null);
+        swal({title:'Logged out',type:'success',onClose:function(){
+            var S = new Signup();
+        }});
+    };
     var appName = row().css('line-height','75px').height('80px');
-    var logoutButton = buttonCol('Logout','','1').height('100%').css('line-height','75px');
+    var logoutButton = buttonCol(buttonName,'','1').height('100%').css('line-height','75px').click(click);
     var styledText = div().addClass('appName col-xs-3').text(name).css('font-size','26px').css('color','black').css('letter-spacing','10px')
         .css('text-transform', 'uppercase').css('display','inline-block').css('font-family','Open Sans Condensed').height('100%').css('background-color',transparentWhiteHeavy());
 
@@ -30,11 +38,6 @@ var siteBar = function (name) {
         styledText,
         col('8').height('100%').css('background-color',transparentWhiteHeavy()),
         logoutButton
-        // div().addClass('col-xs-1 col-xs-offset-8 text-right').append(
-        //     $('<span>').addClass('text-center').css('font-size','large')
-        //         .html('&nbsp;Logout&nbsp;').css('display','inline-block').css('color','black').css('border-radius','5px')
-        //         .css('border','1px solid black').css('cursor','pointer').css('min-width','91px')
-        // )
     );
 };
 
@@ -42,7 +45,7 @@ var base64ImageGradient = function(image,gradient){
 
 };
 var base64Image = function(){
-    return
+    //return
 };
 
 var panelTitle = function(name){

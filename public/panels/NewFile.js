@@ -2,9 +2,8 @@ var NewFile = function (name) {
 
     var prototype = {Name:'',Type:''};
     var self = this;
-    this.newFilePanel = dimensionalPanel();
+    this.viewFilePanel = dimensionalPanel();
     this.panelTitleBar = panelTitle('Add '+name);
-
     this.fileUploadInput = input('Files','file').css('display','none').attr('name','file').attr('multiple','multiple').change(function(){
         var formData = new FormData();
         var inputVal = $(this).get(0).files;
@@ -59,7 +58,7 @@ var NewFile = function (name) {
         this.inputs.append(new input(k))
     }
 
-    return this.newFilePanel.append(
+    return this.viewFilePanel.append(
         this.panelTitleBar,
         this.upload,
         this.fileUploadInput,

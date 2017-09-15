@@ -3,6 +3,8 @@ var folderPath = sessionStorage.getItem('folder');
 
 var WebApp = function(){
 
+    //var s = new Signup();
+
     var homeImage = 'public/images/bg4.jpg';
 
     this.backgroundImage = div().addClass('backgroundImage');
@@ -10,8 +12,7 @@ var WebApp = function(){
     this.contentRow = row().addClass('contentRow');
     this.naviCol = col(3);
     this.contentCol = col(9);
-    this.contentContainer = $('<div>');
-    this.contentContainer.addClass('text-center');
+    this.contentContainer = div().addClass('text-center')
 };
 
 WebApp.prototype = {
@@ -92,7 +93,7 @@ WebApp.prototype = {
     },
 
     assemble: function(data){
-        $('body').append(
+        $('body').empty().append(
             this.backgroundImage,
             this.contentContainer.append(
                 siteBar('Files'),
@@ -104,6 +105,6 @@ WebApp.prototype = {
                         new FaceMatrix(data))
                 )
             )
-        );
+        ).css('overflow-y','auto');
     }
 };
