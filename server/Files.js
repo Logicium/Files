@@ -1,5 +1,6 @@
 var express = require('express');
-var fs = require('fs');
+var fs = require('fs-extra');
+var mkdirp = require('mkdirp');
 var router = express.Router();
 var multer  =   require('multer');
 var path = require('path');
@@ -10,15 +11,19 @@ var Databases = require('./Databases');
 
 router.post('/list',function(request,response){
     console.log(request.body);
-    Databases.Users.findOne({loginToken: request.body.token.substring(0,12)},function(err, doc) {
+    Databases.Users.findOne({loginToken: request.body.token},function(err, doc) {
         var basepath = doc.userFolder;
         console.log(doc);
         if (doc) {
             DirectoryStructureJSON.getStructure(fs, basepath, function (err, structure, total) {
                 if (err) console.log(err);
-                console.log('there are a total of: ', total.folders, ' folders and ', total.files, ' files');
-                console.log('the structure looks like: ', JSON.stringify(structure, null, 4));
-                response.send(structure);
+                if(structure instanceof Array && structure.length === 0){
+                    response.send({type:'folder',name:(doc.username+'-'+doc.created),children:[],totals:{folders:0,files:0}});
+                }else{
+                    console.log('there are a total of: ', total.folders, ' folders and ', total.files, ' files');
+                    console.log('the structure looks like: ', JSON.stringify(structure, null, 4));
+                    response.send(structure);
+                }
             });
         }
         else{
@@ -27,7 +32,66 @@ router.post('/list',function(request,response){
     });
 
     //var basepath = './server/folders/'+request.body.userFolder;
+});
 
+function ucfirst(str) {
+    var firstLetter = str.substr(0, 1);
+    return firstLetter.toUpperCase() + str.substr(1);
+}
+
+router.post('/newFolder',function (request,response) {
+    Databases.Users.findOne({loginToken:request.body.token},function (err, doc) {
+        if(doc){
+            mkdirp('./server/folders'+request.body.path, function (err) {
+                if (err) console.error(err)
+                response.send({message: 'Folder created', type: 'success'})
+            });
+        }
+    });
+});
+
+router.post('/uploadFiles',function(request,response){
+
+    Databases.Users.findOne({loginToken:request.body.token},function (err, doc) {
+        if(doc){
+            var storage = multer.diskStorage({
+                destination: function (req, file, callback) {
+                    callback(null, './server/temp');
+                },
+                filename: function (req, file, callback) {
+                    callback(null, file.originalname);
+                }
+            });
+            var upload = multer({ storage : storage}).array('file');
+
+            upload(request,response,function(err) {
+                if(err) {
+                    return response.end(JSON.stringify({message:"Error uploading file.",type:'error',err:err}));
+                }
+
+                console.log(request.body);
+                console.log(request.files);
+
+                var dir = request.body.path;
+
+                for(var i in request.files){
+
+                    var fileName = request.files[i].filename;
+                    console.log('File '+ fileName);
+
+                    fs.move('./server/temp/' + fileName, './server/folders' + dir + '/' + fileName, function (err) {
+                        if (err) {
+                            return console.error(err);
+                        }
+                    });
+                }
+                response.end(JSON.stringify({message:"File is Uploaded",filename:request.files.filename,type:'success'}));
+            });
+        }
+        else{
+            response.send({message: 'User not Found', type: 'error'})
+        }
+    });
 });
 
 router.post('/login', function (request, response) {
@@ -39,8 +103,8 @@ router.post('/login', function (request, response) {
     var Users = Databases.Users.findOne({username:incomingUser.username,password:incomingUser.password},function(err,doc){
         console.log(doc);
         if (doc) {
-            var token = jwt.sign({U:incomingUser.username}, 'superSecret', {expiresIn: '10h'}); //expires in 24 hours
-            doc.loginToken = token.substring(0,12);
+            var token = jwt.sign({U:incomingUser.username}, 'superSecret', {expiresIn: '10h'});
+            doc.loginToken = token;
             doc.save(function (err) {});
             response.send({message: 'Login Success!', data:doc, success: true, token: token});
         }
@@ -50,6 +114,24 @@ router.post('/login', function (request, response) {
     });
 });
 
+router.post('/image',function(request,response){
+    console.log(request.body);
+    Databases.Users.findOne({loginToken: request.body.token},function(err, doc) {
+        //var basepath = doc.userFolder;
+        console.log(doc);
+        if (doc) { //also check if that file is shared with user
+            console.log(request.body.path);
+            var img = fs.readFileSync(request.body.path);
+            var img64 = new Buffer(img).toString('base64');
+            //console.log('Img64: '+img64);
+            response.writeHead(200, {'Content-Type': 'image/'+(request.body.extension).slice(1),'Content-Length': img64.length});
+            response.end(img64);
+        }
+        else{
+            response.send({message: 'User not Found', type: 'error'});
+        }
+    });
+});
 
 router.use(function(req, res, next) {
     console.log(req.file);
@@ -90,24 +172,36 @@ router.post('/add',function(request,response){
     });
 });
 
-router.post('/update',function(request,response){
+router.post('/uploadFolder',function(request,response){
     console.log(request.body);
-    var parentName = request.body.parentTitle;
-    console.log(parentName);
-    var parentIndex = request.body.parentIndex;
-    var newConfig = JSON.parse(request.body.newConfig);
-    console.log(newConfig);
 
-    Databases.Users.findOne({name:parentName},function (err, doc) {
+    Databases.Users.findOne({loginToken:request.body.token},function (err, doc) {
+        if(doc){
+            var parentFolderPath = request.body.path;
+            var storage = multer.diskStorage({
+                destination: function (req, file, callback) {
+                    callback(null, './server'+parentFolderPath);
+                },
+                filename: function (req, file, callback) {
+                    callback(null, file.originalname);
+                }
+            });
+            var upload = multer({ storage : storage}).array('files');
 
-        console.log(JSON.stringify(doc));
-        doc.data = newConfig[parentIndex].data;
-        console.log('Logging doc');
-        doc.save(function (err) {});
-        response.send({message:'Successfully Updated',doc:doc});
+            upload(request,response,function(err) {
+                console.log(request.files);
+                if(err) {
+                    return response.end(JSON.stringify({message:"Error uploading file.",type:'error'}));
+                }
+                response.end(JSON.stringify({message:"File is Uploaded",filename:request.files.filename,type:'success'}));
+            });
+        }
+        else{
+            response.send({message: 'User not Found', type: 'error'})
+        }
     });
-
 });
+
 
 router.post('/find',function(request,response){
     console.log(request.body);

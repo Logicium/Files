@@ -1,0 +1,3 @@
+var AudioEditor = function () {
+
+};
