@@ -3,12 +3,10 @@ var folderPath = sessionStorage.getItem('folder');
 
 var WebApp = function(){
 
-    //var s = new Signup();
-
     var homeImage = 'public/images/bg4.jpg';
 
     this.backgroundImage = div().addClass('backgroundImage');
-    this.backgroundImage.css(Styles.backgroundImage(homeImage));
+    this.backgroundImage.css(Styles.backgroundImageFull(homeImage));
     this.contentRow = row().addClass('contentRow');
     this.naviCol = col(3);
     this.contentCol = col(9);

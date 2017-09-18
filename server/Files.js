@@ -5,9 +5,17 @@ var router = express.Router();
 var multer  =   require('multer');
 var path = require('path');
 var jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 var DirectoryStructureJSON = require('directory-structure-json');
-
 var Databases = require('./Databases');
+
+var transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: 'webadmin@ascensionfactory.com',
+        pass: 'superSecret'
+    }
+});
 
 router.post('/list',function(request,response){
     console.log(request.body);
@@ -43,7 +51,7 @@ router.post('/newFolder',function (request,response) {
     Databases.Users.findOne({loginToken:request.body.token},function (err, doc) {
         if(doc){
             mkdirp('./server/folders'+request.body.path, function (err) {
-                if (err) console.error(err)
+                if (err) console.error(err);
                 response.send({message: 'Folder created', type: 'success'})
             });
         }
@@ -92,6 +100,46 @@ router.post('/uploadFiles',function(request,response){
             response.send({message: 'User not Found', type: 'error'})
         }
     });
+});
+
+router.post('/signup',function(request,response){
+    console.log("New user signup request.");
+    var incomingUser = JSON.parse(request.body.user);
+    console.log(incomingUser['email']);
+
+    Databases.Users.count({email:incomingUser['email']},function(err,count){
+       if(count>0){
+           response.send({message:'Username is taken',type:'warning'});
+       }
+       else{
+           incomingUser.verified = 'false';
+           Databases.Users.insert(incomingUser,function(err,newUser){
+               if(err) return console.log('err');
+               Databases.Folders.insert({user:newUser._id,filesystem:[]},function(err,docs){
+                   if(err) return console.log('err');
+                   console.log(docs);
+                   var mailOptions = {
+                       from: '"Files3D Team" <webadmin@files3d.herokuapp.com>', // sender address
+                       to: newUser['email'], // list of receivers as string
+                       subject: 'Files3D Email Verification',
+                       html: 'Verify your email for Files3d<br><br><pre>'+JSON.stringify(newUser,null, 2).toString()+'</pre>'
+                   };
+                   transporter.sendMail(mailOptions, function(error, info) {
+                       if (error) return console.log(error);
+                       //console.log('Message %s sent: %s', info.messageId, info.response);
+                       response.send({message:'New User Added',doc:newUser,type:'success'});
+                   });
+               });
+           });
+       }
+    });
+});
+
+router.post('/verifyEmail',function(request,response){
+
+    //Find user in database with token in email
+
+
 });
 
 router.post('/login', function (request, response) {

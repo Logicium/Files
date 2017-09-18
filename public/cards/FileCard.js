@@ -1,6 +1,6 @@
 var FileCard = function (fileData) {
 
-    this.fileCard = col(3).removeClass('text-center').addClass('text-left').css('padding','5px').css('padding-top','25px').click(function(){
+    this.fileCard = col(3).removeClass('text-center').addClass('text-left').css(Styles.padding({t:'25px',a:'5px'})).click(function(){
 
         var nr = new NaviRow(fileData.name);
         $('.levelNavi').append(nr.playKeyframe(
@@ -27,8 +27,8 @@ var FileCard = function (fileData) {
 
     });
     this.name = highlightText(fileData.name.trunc(25)).css('text-overflow','ellipsis').css('white-space','pre-line').css('word-break','break-all').css('font-size','22px').css('font-family','Open Sans Condensed');
-    this.type = highlightTextLight('Type | '+ (fileData.extension || fileData.type)).css('font-size','16px').css('font-family','Open Sans Condensed');
-    this.infoContainer  = div().height('200px').css(click());
+    this.type = highlightTextLight('Type | '+ (fileData.extension || fileData.type)).css(Styles.font({size:'16px'}));
+    this.infoContainer  = div().height('200px').css(Styles.click());
     var self=this;
     if(/(jpg|gif|png|JPG|GIF|PNG|JPEG|jpeg)$/.test(fileData.extension)){
         $.post('/files/image',{path:fileData.path,extension:fileData.extension,token:Token},function(data){
@@ -45,8 +45,3 @@ var FileCard = function (fileData) {
         )
     );
 };
-
-String.prototype.trunc = String.prototype.trunc ||
-    function(n){
-        return (this.length > n) ? this.substr(0, n-1) + '&hellip;' : this;
-    };

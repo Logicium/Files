@@ -16,6 +16,10 @@ var navDiv = function(){
         .css('height','50px').css('color','white').addClass('text-center').css('cursor','pointer')
 };
 
+var dimensionalWindow = function(perspective){
+    return div().css('transform-style','preserve-3d').css('perspective', perspective || '50em');
+};
+
 var col = function(colNum){
     return  div().addClass('col-xs-'+colNum).addClass('text-center');
 };
@@ -49,9 +53,9 @@ var base64Image = function(){
 };
 
 var panelTitle = function(name){
-    var appName = row().css('line-height','60px').css('padding','10px').css('background-color',transparentWhiteHeavy()).css('margin-bottom','10px');
+    var appName = row().css('color','black').css('line-height','60px').css('padding','10px').css('background-color',transparentWhiteHeavy()).css('margin-bottom','10px');
     return appName.append(
-        div().width('100%').addClass('text-center').text(name).css('font-size','24px').css('color','black').css('letter-spacing','8px')
+        div().width('100%').addClass('text-center').text(name).css('font-size','24px').css('letter-spacing','8px')
             .css('text-transform', 'uppercase').css('display','inline-block').css('font-family','Open Sans Condensed')
     );
 };
