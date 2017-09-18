@@ -214,6 +214,16 @@ body {
     -webkit-transition: .2s ease;
     transition: .2s ease; }
 
+.inputBlack::-webkit-input-placeholder { /* Chrome */
+    /*color: #fefcff;*/
+    color: #2e2e2e;
+}
+
+.inputWhite::-webkit-input-placeholder { /* Chrome */
+    color: #fefcff;
+    /*color: #2e2e2e;*/
+}
+
 ::-webkit-input-placeholder { /* Chrome */
     /*color: #fefcff;*/
     color: #2e2e2e;
@@ -308,5 +318,3 @@ body {
 .expirationBar {
     height: 20px;
     width: 80%; }
-
-/*# sourceMappingURL=Orga.css.map */

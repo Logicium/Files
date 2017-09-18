@@ -115,6 +115,8 @@ router.post('/signup',function(request,response){
                 if(err) return console.log('err');
                 Databases.Folders.insert({user:newUser._id,filesystem:[]},function(err,docs){
                     if(err) return console.log('err');
+                    newUser.userFolder = docs._id;
+                    newUser.save();
                     console.log(docs);
                     var mailOptions = {
                         from: '"Files3D Team" <webadmin@files3d.herokuapp.com>', // sender address

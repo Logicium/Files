@@ -1,7 +1,7 @@
 var div = function(){return $('<div>')};
 var text = function(string,color,size){return div().text(string).css('color',color).css('font-size',size);};
 
-var panel = function(){return div().addClass('contentPanel animated fadeIn').css('overflow','auto').css('padding','100px').css('padding-top','25px');}
+var panel = function(){return div().addClass('contentPanel animated fadeIn').css('overflow','auto').css('padding','100px').css('padding-top','25px');};
 
 var highlightText = function(text){return $('<span style=\"background: rgba(0,0,0,0.71);\">&nbsp;'+text+'&nbsp;</span>').css('color','white');};
 var highlightTextLight = function(text){return $('<span style=\"background:'+transparentWhiteHeavy()+'\">&nbsp;'+text+'&nbsp;</span>');};
@@ -16,6 +16,10 @@ var navDiv = function(){
         .css('height','50px').css('color','white').addClass('text-center').css('cursor','pointer')
 };
 
+var dimensionalWindow = function(perspective){
+    return div().css('transform-style','preserve-3d').css('perspective', perspective || '50em');
+};
+
 var col = function(colNum){
     return  div().addClass('col-xs-'+colNum).addClass('text-center');
 };
@@ -23,12 +27,12 @@ var col = function(colNum){
 var siteBar = function (name,buttonName,click) {
     buttonName = buttonName || 'Logout';
     click = click || function(){
-        sessionStorage.setItem('token',null);
-        sessionStorage.setItem('folder',null);
-        swal({title:'Logged out',type:'success',onClose:function(){
-            var S = new Signup();
-        }});
-    };
+            sessionStorage.setItem('token',null);
+            sessionStorage.setItem('folder',null);
+            swal({title:'Logged out',type:'success',onClose:function(){
+                var S = new Signup();
+            }});
+        };
     var appName = row().css('line-height','75px').height('80px');
     var logoutButton = buttonCol(buttonName,'','1').height('100%').css('line-height','75px').click(click);
     var styledText = div().addClass('appName col-xs-3').text(name).css('font-size','26px').css('color','black').css('letter-spacing','10px')
@@ -49,9 +53,9 @@ var base64Image = function(){
 };
 
 var panelTitle = function(name){
-    var appName = row().css('line-height','60px').css('padding','10px').css('background-color',transparentWhiteHeavy()).css('margin-bottom','10px');
+    var appName = row().css('color','black').css('line-height','60px').css('padding','10px').css('background-color',transparentWhiteHeavy()).css('margin-bottom','10px');
     return appName.append(
-        div().width('100%').addClass('text-center').text(name).css('font-size','24px').css('color','black').css('letter-spacing','8px')
+        div().width('100%').addClass('text-center').text(name).css('font-size','24px').css('letter-spacing','8px')
             .css('text-transform', 'uppercase').css('display','inline-block').css('font-family','Open Sans Condensed')
     );
 };
