@@ -106,30 +106,32 @@ router.post('/signup',function(request,response){
     console.log(incomingUser['email']);
 
     Databases.Users.count({email:incomingUser['email']},function(err,count){
-       if(count>0){
-           response.send({message:'Username is taken',type:'warning'});
-       }
-       else{
-           incomingUser.verified = 'false';
-           Databases.Users.insert(incomingUser,function(err,newUser){
-               if(err) return console.log('err');
-               Databases.Folders.insert({user:newUser._id,filesystem:[]},function(err,docs){
-                   if(err) return console.log('err');
-                   console.log(docs);
-                   var mailOptions = {
-                       from: '"Files3D Team" <webadmin@files3d.herokuapp.com>', // sender address
-                       to: newUser['email'], // list of receivers as string
-                       subject: 'Files3D Email Verification',
-                       html: 'Verify your email for Files3d<br><br><pre>'+JSON.stringify(newUser,null, 2).toString()+'</pre>'
-                   };
-                   transporter.sendMail(mailOptions, function(error, info) {
-                       if (error) return console.log(error);
-                       //console.log('Message %s sent: %s', info.messageId, info.response);
-                       response.send({message:'New User Added',doc:newUser,type:'success'});
-                   });
-               });
-           });
-       }
+        if(count>0){
+            response.send({message:'Username is taken',type:'warning'});
+        }
+        else{
+            incomingUser.verified = 'false';
+            Databases.Users.insert(incomingUser,function(err,newUser){
+                if(err) return console.log('err');
+                Databases.Folders.insert({user:newUser._id,filesystem:[]},function(err,docs){
+                    if(err) return console.log('err');
+                    newUser.userFolder = docs._id;
+                    newUser.save();
+                    console.log(docs);
+                    var mailOptions = {
+                        from: '"Files3D Team" <webadmin@files3d.herokuapp.com>', // sender address
+                        to: newUser['email'], // list of receivers as string
+                        subject: 'Files3D Email Verification',
+                        html: 'Verify your email for Files3d<br><br><pre>'+JSON.stringify(newUser,null, 2).toString()+'</pre>'
+                    };
+                    transporter.sendMail(mailOptions, function(error, info) {
+                        if (error) return console.log(error);
+                        //console.log('Message %s sent: %s', info.messageId, info.response);
+                        response.send({message:'New User Added',doc:newUser,type:'success'});
+                    });
+                });
+            });
+        }
     });
 });
 
