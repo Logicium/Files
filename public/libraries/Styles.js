@@ -34,6 +34,7 @@ var Styles = {
             'font-size': size ||'16px'
         }
     },
+
     font:function (obj) {
         obj = obj ||{};
         return {
@@ -42,6 +43,7 @@ var Styles = {
             'color':obj.color||'black'
         }
     },
+
     padding:function(pad){
         pad = pad || {};
         return {
@@ -52,18 +54,21 @@ var Styles = {
             'padding-right':pad.r
         }
     },
+
     backgroundImage:function(image){
         return {
             'background-image':'url('+ image +')',
             'background-size':'cover'
         }
     },
+
     base64Image:function(image,crop) {
         return {
             'background-image': 'url(data:image/jpg;base64,' + image + ')',
             'background-size': crop || 'cover'
         };
     },
+
     gradientImage:function(obj){
         obj = obj || {};
         return{
@@ -102,6 +107,6 @@ var base64Image = function(image,crop){
     };
 };
 
-var gradientImage = function(image,gradient1,gradient2){
-    return {}
-};
+// var gradientImage = function(image,gradient1,gradient2){
+//     return {}
+// };

@@ -23,15 +23,18 @@ router.post('/list',function(request,response){
         var basepath = doc.userFolder;
         console.log(doc);
         if (doc) {
+          Databases.Folders.find({user:doc._id},function(err,docs){
+            if (err) console.log(err);
+            if(docs.length === 0){
+                response.send({type:'folder',name:(doc.username+'-'+doc.created),children:[],totals:{folders:0,files:0}});
+            }else{
+                console.log('there are a total of: ', docs.length, ' folders and ', total.files, ' files');
+                console.log(docs);
+                response.send(docs);
+            }
+          });
             DirectoryStructureJSON.getStructure(fs, basepath, function (err, structure, total) {
-                if (err) console.log(err);
-                if(structure instanceof Array && structure.length === 0){
-                    response.send({type:'folder',name:(doc.username+'-'+doc.created),children:[],totals:{folders:0,files:0}});
-                }else{
-                    console.log('there are a total of: ', total.folders, ' folders and ', total.files, ' files');
-                    console.log('the structure looks like: ', JSON.stringify(structure, null, 4));
-                    response.send(structure);
-                }
+
             });
         }
         else{

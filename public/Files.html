@@ -43,23 +43,14 @@
 
         $(function(){
             var Token = sessionStorage.getItem('token');
-            var folderPath = sessionStorage.getItem('folder');
-
-            if(Token === null || Token === 'null') {
-                var S = new Signup();
-            }
+            if(Token === null || Token === 'null') { var S = new Signup(); }
             else{
-                console.log(folderPath);
-                $.post('/files/list',{token:Token},function(data){
-                    console.log(data);
-                    var WA = new WebApp();
-                    WA.assemble(data);
+                $.post('/files/home',{token:Token},function(data){
+                  console.log(data);
+                  var WA = new WebApp().assemble(data);
                 });
             }
-
         });
-
-
 
     </script>
 </body>

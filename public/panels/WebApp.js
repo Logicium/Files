@@ -56,7 +56,7 @@ WebApp.prototype = {
                             sessionStorage.setItem('folder',data.data.userFolder);
                             swal({title: data.message, type: 'success'});
 
-                            $.post('/files/list',{token:Token},function(data){
+                            $.post('/files/home',{token:Token},function(data){
                                 console.log(data);
                                 self.assemble(data);
                             });
@@ -72,7 +72,7 @@ WebApp.prototype = {
         }
         else{
             console.log(folderPath);
-            $.post('/files/list',{token:Token},function(data){
+            $.post('/files/home',{token:Token},function(data){
                 console.log(data);
                 self.assemble(data);
             });

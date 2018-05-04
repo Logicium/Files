@@ -20,23 +20,22 @@ var transporter = nodemailer.createTransport({
 router.post('/list',function(request,response){
     console.log(request.body);
     Databases.Users.findOne({loginToken: request.body.token},function(err, doc) {
-        var basepath = doc.userFolder;
         console.log(doc);
-        if (doc) {
-            DirectoryStructureJSON.getStructure(fs, basepath, function (err, structure, total) {
-                if (err) console.log(err);
-                if(structure instanceof Array && structure.length === 0){
-                    response.send({type:'folder',name:(doc.username+'-'+doc.created),children:[],totals:{folders:0,files:0}});
-                }else{
-                    console.log('there are a total of: ', total.folders, ' folders and ', total.files, ' files');
-                    console.log('the structure looks like: ', JSON.stringify(structure, null, 4));
-                    response.send(structure);
-                }
-            });
-        }
-        else{
-            response.send({message: 'Folder not found', type: 'error'});
-        }
+        Databases.Folders.find({user:doc._id},function(err,docs){
+            if(err){return console.log(err)}
+            response.send(docs);
+        });
+    });
+});
+
+router.post('/home',function(request,response){
+    console.log(request.body);
+    Databases.Users.findOne({loginToken: request.body.token},function(err, doc) {
+        console.log(doc);
+        Databases.Folders.findOne({_id:doc.homeFolder},function(err,folder){
+            if(err){return console.log(err)}
+            response.send(folder);
+        });
     });
 });
 
@@ -47,12 +46,16 @@ function ucfirst(str) {
 
 router.post('/newFolder',function (request,response) {
     Databases.Users.findOne({loginToken:request.body.token},function (err, doc) {
-        if(doc){
-            mkdirp('./server/folders'+request.body.path, function (err) {
-                if (err) console.error(err);
-                response.send({message: 'Folder created', type: 'success'})
-            });
-        }
+        if(err){return console.log(err)}
+
+        Databases.Folders.find({user:doc._id});
+
+        mkdirp('./server/folders'+request.body.path, function (err) {
+            if (err) console.error(err);
+            response.send({message: 'Folder created', type: 'success'})
+        });
+
+
     });
 });
 
