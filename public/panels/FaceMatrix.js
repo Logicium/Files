@@ -77,7 +77,7 @@ var FacePanel = function (FaceData) {
                 .css({'transform':'translateY(300px) translateZ('+transformValue+'px)'});
         });
 
-        $('.faceMatrix').prepend(new NewFile(newData.name).playKeyframe({
+        $('.faceMatrix').prepend(new NewFile(newData.name,FaceData._id).playKeyframe({
             name:'new-panel',duration:'1s',timingFunction:'ease',complete:function(){$(this).resetKeyframe()}
         }));
 

@@ -1,4 +1,4 @@
-var NewFile = function (name) {
+var NewFile = function (name,folderPath) {
 
     var prototype = {Name:'',Type:''};
     var self = this;
@@ -10,17 +10,9 @@ var NewFile = function (name) {
         for(var i in inputVal){
             formData.append('file',inputVal[i]);
         }
-
-        var parentFolderPath = '';
-        $.each($('.naviName'),function(){
-            var name = $(this).text();
-            parentFolderPath = parentFolderPath+'/'+name;
-        });
-        parentFolderPath = parentFolderPath.substring(0,parentFolderPath.lastIndexOf('/New Files'));
-
         formData.append('token',Token);
-        formData.append('path',parentFolderPath);
-        console.log(parentFolderPath);
+        formData.append('folder',folderPath);
+        console.log(folderPath);
         $.ajax({
             url:'/files/uploadFiles',
             type: 'POST',

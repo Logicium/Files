@@ -50,11 +50,13 @@ router.post('/newFolder',function (request,response) {
 
         Databases.Folders.find({user:doc._id});
 
+        Databases.Folders.insert({},function(err,folder){});
+
+        //deprecated
         mkdirp('./server/folders'+request.body.path, function (err) {
             if (err) console.error(err);
             response.send({message: 'Folder created', type: 'success'})
         });
-
 
     });
 });
@@ -65,35 +67,24 @@ router.post('/uploadFiles',function(request,response){
         if(doc){
             var storage = multer.diskStorage({
                 destination: function (req, file, callback) {
-                    callback(null, './server/temp');
+                    callback(null, './server/uploads');
                 },
                 filename: function (req, file, callback) {
-                    callback(null, file.originalname);
+                    var extension = file.mimetype.split("/")[extArray.length - 1];
+                    var newFileScheme = {name:file.originalname,extension:extension,created:Date.now(),user:doc._id,folder:request.body.folder}
+                    var newFile = new Databases.Files(newFileScheme);
+                    newFile.save(function(err){});
+                    console.log(newFile);
+                    var folder = Databases.Folders.findOne({_id:newFile.folder},function(err,folder){folder.children.push(newFile._id);folder.save(err);});
+                    callback(null, newFile._id + '.' + newFile.extension);
                 }
             });
             var upload = multer({ storage : storage}).array('file');
 
             upload(request,response,function(err) {
-                if(err) {
-                    return response.end(JSON.stringify({message:"Error uploading file.",type:'error',err:err}));
-                }
-
+                if(err) {return response.end(JSON.stringify({message:"Error uploading file.",type:'error',err:err}));}
                 console.log(request.body);
                 console.log(request.files);
-
-                var dir = request.body.path;
-
-                for(var i in request.files){
-
-                    var fileName = request.files[i].filename;
-                    console.log('File '+ fileName);
-
-                    fs.move('./server/temp/' + fileName, './server/folders' + dir + '/' + fileName, function (err) {
-                        if (err) {
-                            return console.error(err);
-                        }
-                    });
-                }
                 response.end(JSON.stringify({message:"File is Uploaded",filename:request.files.filename,type:'success'}));
             });
         }

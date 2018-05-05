@@ -1,2 +1,5 @@
 /.idea
 /users.db
+/folders.db
+/files.db
+/server/uploads
