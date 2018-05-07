@@ -11,12 +11,10 @@ var NewFolder = function (name,folderPath) {
         var newFolderName = inputVal[0].webkitRelativePath.split('/')[0];
         formData.append('token',Token);
         $.post('/files/newFolder',{token:Token,name:newFolderName,folder:folderPath},function(data){
-          console.log(folderPath,data.folder);
           formData.append('folder',data.folder);
           for(var i in inputVal){
             formData.append('file',inputVal[i]);
           }
-          //console.log(...formData)
             $.ajax({
                 url:'/files/uploadFiles',
                 type: 'POST',
