@@ -4,7 +4,6 @@ var app = express();
 var http = require('http').Server(app);
 var util = require('util');
 var path = require('path');
-//var formidable = require('express-formidable');
 
 var allowCrossDomain = function(req,res,next){
     res.header('Access-Control-Allow-Origin', '*');
@@ -14,8 +13,6 @@ var allowCrossDomain = function(req,res,next){
 };
 app.use(allowCrossDomain);
 app.set('port', (process.env.PORT || 5000));
-
-var urlencodedParser = bodyParser.urlencoded({ extended: true });
 app.use("/public",  express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));

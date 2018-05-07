@@ -112,7 +112,7 @@ router.post('/uploadFiles',function(request,response){
         if(doc){
             var storage = multer.diskStorage({
                 destination: function (req, file, callback) {
-                    callback(null, './server/uploads');
+                    callback(null, './public/uploads');
                 },
                 filename: function (req, file, callback) {
                     var extArray = file.mimetype.split("/");
@@ -120,7 +120,7 @@ router.post('/uploadFiles',function(request,response){
                     var newFileScheme = {name:file.originalname,type:'file',extension:extension,created:Date.now(),user:doc._id,folder:request.body.folder}
                     var newFile = new Databases.Files(newFileScheme);
                     newFile.save(function(err){});
-                    newFile.path = 'server/uploads/'+newFile._id + '.' + newFile.extension;
+                    newFile.path = 'public/uploads/'+newFile._id + '.' + newFile.extension;
                     newFile.save(function(err){});
                     console.log(newFile);
                     var folder = Databases.Folders.findOne({_id:newFile.folder},function(err,folder){folder.children.push(newFile._id);folder.save(err);});
