@@ -22,6 +22,7 @@ var allUsers = Databases.Users.find({},function(err,docs){
 
         var homeFolder = {
           name:'Home',
+          type:'folder',
           user:'',
           created:now,
           children:[]

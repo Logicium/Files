@@ -1,4 +1,4 @@
-var NewFolder = function (name) {
+var NewFolder = function (name,folderPath) {
 
     var prototype = {Name:''};
     var self = this;
@@ -8,21 +8,15 @@ var NewFolder = function (name) {
     this.uploadInput = input('Folder','file').css('display','none').attr('webkitdirectory','webkitdirectory').attr('multiple','multiple').change(function(){
         var formData = new FormData();
         var inputVal = $(this).get(0).files;
-        for(var i in inputVal){
-            formData.append('file',inputVal[i]);
-        }
-
-        var parentFolderPath = '';
-        $.each($('.naviName'),function(){
-            var name = $(this).text();
-            parentFolderPath = parentFolderPath+'/'+name;
-        });
         var newFolderName = inputVal[0].webkitRelativePath.split('/')[0];
-        parentFolderPath = parentFolderPath.substring(0,parentFolderPath.lastIndexOf('/New Folder')) + '/'+newFolderName;
         formData.append('token',Token);
-        formData.append('path',parentFolderPath);
-        console.log(parentFolderPath);
-        $.post('/files/newFolder',{token:Token,path:parentFolderPath},function(data){
+        $.post('/files/newFolder',{token:Token,name:newFolderName,folder:folderPath},function(data){
+          console.log(folderPath,data.folder);
+          formData.append('folder',data.folder);
+          for(var i in inputVal){
+            formData.append('file',inputVal[i]);
+          }
+          //console.log(...formData)
             $.ajax({
                 url:'/files/uploadFiles',
                 type: 'POST',

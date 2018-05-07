@@ -2,7 +2,7 @@ var express = require('express');
 var fs = require('fs-extra');
 var mkdirp = require('mkdirp');
 var router = express.Router();
-var multer  =   require('multer');
+var multer = require('multer');
 var path = require('path');
 var jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
@@ -28,13 +28,61 @@ router.post('/list',function(request,response){
     });
 });
 
+function dataChange(folder,callback){
+  var children = folder.children;
+  var newChildren = [];
+  var count = 0;
+  if(children.length === 0){folder.children=newChildren;callback(folder);}
+  for (var i = 0; i < children.length; i++) {
+    var childId = folder.children[i]+'';
+    console.log(childId);
+    Databases.Files.findOne({_id:childId},function(err,childDoc){
+      if(!(childDoc == null)){
+        console.log(childDoc);
+        newChildren.push(childDoc);
+        count++;
+        console.log(count,children.length)
+        if (count === children.length) {
+          folder.children = newChildren;
+          callback(folder);
+        }
+      }
+    });
+    Databases.Folders.findOne({_id:childId},function(err,childDoc){
+      if(!(childDoc == null)){
+        console.log(childDoc);
+        if(childDoc.children.length>0){
+          dataChange(childDoc,function(completeFolder){
+            newChildren.push(completeFolder);
+            count++;
+            console.log(count,children.length);
+            if (count === children.length) {
+              folder.children = newChildren;
+              callback(folder);
+            }
+          });
+        }
+        else{
+          newChildren.push(childDoc);
+          count++;
+          console.log(count,children.length);
+          if (count === children.length) {
+            folder.children = newChildren;
+            callback(folder);
+          }
+        }
+      }
+    });
+  }
+}
+
 router.post('/home',function(request,response){
     console.log(request.body);
     Databases.Users.findOne({loginToken: request.body.token},function(err, doc) {
         console.log(doc);
         Databases.Folders.findOne({_id:doc.homeFolder},function(err,folder){
             if(err){return console.log(err)}
-            response.send(folder);
+            dataChange(folder,function(completeFolder){response.send(completeFolder);});
         });
     });
 });
@@ -46,23 +94,20 @@ function ucfirst(str) {
 
 router.post('/newFolder',function (request,response) {
     Databases.Users.findOne({loginToken:request.body.token},function (err, doc) {
-        if(err){return console.log(err)}
+        if(err){return console.log(err);}
 
-        Databases.Folders.find({user:doc._id});
-
-        Databases.Folders.insert({},function(err,folder){});
-
-        //deprecated
-        mkdirp('./server/folders'+request.body.path, function (err) {
-            if (err) console.error(err);
-            response.send({message: 'Folder created', type: 'success'})
+        var newFolder = new Databases.Folders({name:request.body.name,type:'folder',children:[],user:doc._id,created:Date.now()});
+        newFolder.save(function(err){});
+        Databases.Folders.findOne({_id:request.body.folder},function(err,folder){
+          folder.children.push(newFolder._id);
+          folder.save(function(err){});
+          response.send({message: 'Folder created', folder:newFolder._id, type: 'success'})
         });
-
     });
 });
 
 router.post('/uploadFiles',function(request,response){
-
+    console.log(request.body);
     Databases.Users.findOne({loginToken:request.body.token},function (err, doc) {
         if(doc){
             var storage = multer.diskStorage({
@@ -70,9 +115,12 @@ router.post('/uploadFiles',function(request,response){
                     callback(null, './server/uploads');
                 },
                 filename: function (req, file, callback) {
-                    var extension = file.mimetype.split("/")[extArray.length - 1];
-                    var newFileScheme = {name:file.originalname,extension:extension,created:Date.now(),user:doc._id,folder:request.body.folder}
+                    var extArray = file.mimetype.split("/");
+                    var extension = extArray[extArray.length - 1];
+                    var newFileScheme = {name:file.originalname,type:'file',extension:extension,created:Date.now(),user:doc._id,folder:request.body.folder}
                     var newFile = new Databases.Files(newFileScheme);
+                    newFile.save(function(err){});
+                    newFile.path = 'server/uploads/'+newFile._id + '.' + newFile.extension;
                     newFile.save(function(err){});
                     console.log(newFile);
                     var folder = Databases.Folders.findOne({_id:newFile.folder},function(err,folder){folder.children.push(newFile._id);folder.save(err);});
@@ -83,8 +131,8 @@ router.post('/uploadFiles',function(request,response){
 
             upload(request,response,function(err) {
                 if(err) {return response.end(JSON.stringify({message:"Error uploading file.",type:'error',err:err}));}
-                console.log(request.body);
-                console.log(request.files);
+                //console.log(request.body);
+                //console.log(request.files);
                 response.end(JSON.stringify({message:"File is Uploaded",filename:request.files.filename,type:'success'}));
             });
         }

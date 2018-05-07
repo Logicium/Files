@@ -1,13 +1,11 @@
 var FaceMatrix = function(faces){
     this.faceMatrix = div().addClass('faceMatrix').css('perspective','100em');
-
     this.faceMatrix.append(new FacePanel(faces));
-
     return this.faceMatrix;
 };
 
 var FacePanel = function (FaceData) {
-
+    var self = this;
     this.facePanel = div().css('position','absolute').addClass('facePanel').css('background',transparentWhite())
         .css('padding','10px').css('margin','10px').css('min-height','600px').css('width','95%');
     this.buttonClick = function(formInputs){
@@ -49,7 +47,7 @@ var FacePanel = function (FaceData) {
                 .css({'transform':'translateY(300px) translateZ('+transformValue+'px)'});
         });
 
-        $('.faceMatrix').prepend(new NewFolder(newfolderData.name).playKeyframe({
+        $('.faceMatrix').prepend(new NewFolder(newfolderData.name,FaceData._id).playKeyframe({
             name:'new-panel',duration:'1s',timingFunction:'ease',complete:function(){$(this).resetKeyframe()}
         }));
 
@@ -92,12 +90,14 @@ var FacePanel = function (FaceData) {
 
     for(var index in FaceData.children){
 
-        if(FaceData.children[index].type === 'folder'){
-            this.directories.append(new DirectoryCard(FaceData.children[index]))
-        }
-        else if(FaceData.children[index].type === 'file'){
-            this.files.append(new FileCard(FaceData.children[index]))
-        }
+        //syncJSON('',{_id:FaceData.children[index]},function(childData){
+          if(FaceData.children[index].type === 'folder'){
+              self.directories.append(new DirectoryCard(FaceData.children[index]))
+          }
+          else if(FaceData.children[index].type === 'file'){
+              self.files.append(new FileCard(FaceData.children[index]))
+          }
+        //});
     }
 
     return this.facePanel.append(
