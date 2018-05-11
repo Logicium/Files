@@ -9,15 +9,15 @@ function camelCase(str) {
     }).replace(/\s+/g, '');
 }
 
-function syncJSON(i_url, data,callback) {
+function syncJSON(i_url,data,callback) {
     $.ajax({
         type: "POST",
         async: false,
-        url: i_url,
         data:data,
-        contentType: "application/json",
+        url: i_url,
+        //contentType: "application/json",
         dataType: "json",
         success: function (msg) { callback(msg) },
         error: function (msg) { alert('error : ' + msg.d); }
-    });
+      });
 }

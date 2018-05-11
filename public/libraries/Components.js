@@ -1,6 +1,6 @@
 var div = function(){return $('<div>')};
 var text = function(string,color,size){return div().text(string).css('color',color).css('font-size',size);};
-
+var icon = function(icon){return $('<i>').addClass('far fas fa-'+icon)};
 var panel = function(){return div().addClass('contentPanel animated fadeIn').css('overflow','auto').css('padding','100px').css('padding-top','25px');};
 
 var highlightText = function(text){return $('<span style=\"background: rgba(0,0,0,0.71);\">&nbsp;'+text+'&nbsp;</span>').css('color','white');};
@@ -24,6 +24,15 @@ var col = function(colNum){
     return  div().addClass('col-xs-'+colNum).addClass('text-center');
 };
 
+var roundIconSm = function(iconName){
+    this.button = div().css('margin','0 auto');
+    this.round = div().height('45px').width('45px').css({'border':'2px solid white','border-radius':'50%','margin':'0 auto','line-height':'45px'});
+    this.icon = icon(iconName).css({'color':'white','font-size':'18px'});
+    return this.button.append(
+        this.round.append(this.icon),
+    );
+};
+
 var siteBar = function (name,buttonName,click) {
     buttonName = buttonName || 'Logout';
     click = click || function(){
@@ -45,11 +54,16 @@ var siteBar = function (name,buttonName,click) {
     );
 };
 
+var MemberIcon = function(image){
+    var css = {'border':'2px solid white','border-radius':'50%','margin':'0 auto'}
+    return col(1).append( div().css(Styles.backgroundImage(image)).css(css).height('45px').width('45px') );
+}
+
 var base64ImageGradient = function(image,gradient){
 
 };
-var base64Image = function(){
-    //return
+var base64Image = function(data){
+    return div().css('background-image','url(data:image/jpg;base64,'+data+')').css('background-size','cover');
 };
 
 var panelTitle = function(name){

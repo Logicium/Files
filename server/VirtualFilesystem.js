@@ -213,7 +213,6 @@ router.post('/image',function(request,response){
             console.log(request.body.path);
             var img = fs.readFileSync(request.body.path);
             var img64 = new Buffer(img).toString('base64');
-            //console.log('Img64: '+img64);
             response.writeHead(200, {'Content-Type': 'image/'+(request.body.extension).slice(1),'Content-Length': img64.length});
             response.end(img64);
         }
@@ -276,6 +275,15 @@ router.post('/uploadFolder',function(request,response){
     });
 });
 
+router.post('/findUser',function(request,response){
+    console.log("Finding one member: "+(request.body._id || request.body.token ));
+    if(request.body._id === undefined){request.body._id = 'skip'};
+    Databases.Users.findOne({$or:[{'_id':request.body._id},{'loginToken':request.body.token}]}, function (err, doc) {
+        if(doc.icon === undefined){doc.icon = 'public/images/user.png'};
+        doc.save(function(err){});
+        response.send(doc);
+    });
+});
 
 router.post('/find',function(request,response){
     console.log(request.body);
