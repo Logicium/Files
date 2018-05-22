@@ -197,7 +197,7 @@ router.post('/login', function (request, response) {
         if (doc) {
             var token = jwt.sign({U:incomingUser.username}, 'superSecret', {expiresIn: '24h'});
             Databases.Users.findAndModify(
-              {username:incomingUser.username},[],
+              {$or:[{username:incomingUser.username},{email:incomingUser.username}]},[],
               {$set:{loginToken:token}},{},
               function(err,doc){if(err) return console.log(err)}
             );
