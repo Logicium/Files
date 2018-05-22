@@ -81,7 +81,7 @@ var loginClick = function(){
                     sessionStorage.setItem('token',data.token);
                     sessionStorage.setItem('folder',data.data.userFolder);
                     swal({title: data.message, type: 'success',onClose:function(){
-                        $.post('/files/list',{token:Token},function(data){
+                        $.post('/files/home',{token:Token},function(data){
                             console.log(data);
                             var WA = new WebApp();
                             WA.assemble(data);
