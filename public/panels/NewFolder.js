@@ -40,18 +40,9 @@ var NewFolder = function (name,folderPath) {
 
         var inputs = $('input');
         var inputObject = {};
-        $.each(inputs,function () { inputObject[ $(this).attr('placeholder') ] = $(this).val(); });
+        $.each(inputs,function () { inputObject[ $(this).attr('placeholder').toLowerCase() ] = $(this).val(); });
 
-        var parentFolderPath = '';
-        $.each($('.naviName'),function(){
-            var name = $(this).text();
-            console.log(name);
-            parentFolderPath = parentFolderPath+'/'+name;
-        });
-        parentFolderPath = parentFolderPath.substring(0,parentFolderPath.lastIndexOf('/New Folder')) + '/'+inputObject.Name;
-        console.log(parentFolderPath);
-
-        $.post('/files/newFolder',{token:Token,path:parentFolderPath},function (data) {
+        $.post('/files/newFolder',{token:Token,name:inputObject.name,folder:folderPath},function(data){
             swal.resetDefaults();
             swal({title:data.message,type:data.type,timer:2000});
         });
