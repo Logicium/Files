@@ -8,6 +8,7 @@
     "directory-structure-json": "^1.0.0",
     "express": "^4.14.1",
     "fs-extra": "^5.0.0",
+    "gridfs-stream": "^1.1.1",
     "js-beautify": "^1.7.5",
     "jsonwebtoken": "^8.2.1",
     "leveldown": "^1.9.0",
