@@ -6,12 +6,12 @@ var NewFile = function (name,folderPath) {
     this.panelTitleBar = panelTitle('Add '+name);
     this.fileUploadInput = input('Files','file').css('display','none').attr('name','file').attr('multiple','multiple').change(function(){
         var formData = new FormData();
+        formData.append('token',Token);
+        formData.append('folder',folderPath);
         var inputVal = $(this).get(0).files;
         for(var i in inputVal){
             formData.append('file',inputVal[i]);
         }
-        formData.append('token',Token);
-        formData.append('folder',folderPath);
         console.log(folderPath);
         $.ajax({
             url:'/files/uploadFiles',

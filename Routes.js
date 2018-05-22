@@ -7,10 +7,6 @@ var fs = require('fs');
 var path = require('path');
 var jwt = require('jsonwebtoken');
 
-var Databases = require('./server/Databases');
-var Folder = require('./server/libraries/Folder');
-var File = require('./server/libraries/File');
-
 router.get('/',function(request,response){
     response.sendFile('./public/Files.html', {"root": __dirname});
 });

@@ -117,7 +117,7 @@ var DirectoryCard = function(directoryData){
 
     directoryData.totals = directoryData.totals || '';
 
-    if(directoryData.totals == ''){
+    if(directoryData.children.length == 0){
         this.statsRow.append(
             col(12).css('background-color',transparentWhiteHeavy()).text('0 Files & Folders').height('50px')
                 .css('font-size','16px').css('line-height','50px').css('letter-spacing','6px')
@@ -125,17 +125,21 @@ var DirectoryCard = function(directoryData){
         )
     }
     else{
-        var folderCount = directoryData.totals.folders;
-        var fileCount =  directoryData.totals.files;
-        var total = folderCount + fileCount;
-
-        this.directoryPercent = buttonCol().css('min-width','15%').css('max-width','85%').width((folderCount/total)*100+'%').text(folderCount+' Folders');
-        this.filePercent = buttonCol().css('min-width','15%').css('max-width','85%').width((fileCount/total)*100+'%').text(fileCount+' Files');
-
+        //var folderCount = directoryData.folders.length;
+        //var fileCount =  directoryData.files.length;
+        var total = directoryData.children.length
         this.statsRow.append(
-            this.directoryPercent,
-            this.filePercent
+            col(12).css('background-color',transparentWhiteHeavy()).text(total+' Files & Folders').height('50px')
+                .css('font-size','16px').css('line-height','50px').css('letter-spacing','6px')
+                .css('text-transform', 'uppercase').css('font-family','Open Sans Condensed')
         )
+        // this.directoryPercent = buttonCol().css('min-width','15%').css('max-width','85%').width((folderCount/total)*100+'%').text(folderCount+' Folders');
+        // this.filePercent = buttonCol().css('min-width','15%').css('max-width','85%').width((fileCount/total)*100+'%').text(fileCount+' Files');
+        //
+        // this.statsRow.append(
+        //     this.directoryPercent,
+        //     this.filePercent
+        // )
     }
 
     return this.directoryCard.append(
