@@ -1,56 +1,64 @@
 var fs = require('fs');
 var mkdirp = require('mkdirp');
-var LinvoDB = require("linvodb3");
-LinvoDB.dbPath = process.cwd();
 var Databases = {};
-var UsersDB = new LinvoDB('users',{});
-var FoldersDB = new LinvoDB('folders',{});
-var FilesDB = new LinvoDB('files',{});
-var Folder = require('./libraries/Folder');
+var mongodb = require("mongodb");
 
 Databases = {
-    Users: UsersDB,
-    Folders: FoldersDB,
-    Files:FilesDB
+    Users: [],
+    Folders: [],
+    Files:[]
 };
 
-//Initialize first user for Users Database
+Databases.initialize = function(){
+    mongodb.MongoClient.connect('mongodb://admin:superSecret@ds263089.mlab.com:63089/files3d', function (err, database) {
+      if (err) {
+        console.log(err);
+        process.exit(1);
+      }
+        Databases.db = database;
+        Databases.Users = database.collection('users');
+        Databases.Folders = database.collection('folders');
+        Databases.Files = database.collection('files');
 
-var allUsers = Databases.Users.find({},function(err,docs){
-    if(docs.length==0){
-        var now = Date.now();
+        Databases.Users.find({}).toArray(function(err,docs){
+            if(docs.length==0){
+                var now = Date.now();
 
-        var homeFolder = {
-          name:'Home',
-          type:'folder',
-          user:'',
-          created:now,
-          children:[]
-        };
+                var homeFolder = {
+                  name:'Home',
+                  type:'folder',
+                  user:'',
+                  created:now,
+                  children:[]
+                };
 
-        var adminUser = {
-            username:'admin',
-            password:'superSecret',
-            loginToken:'',
-            created: now,
-            homeFolder: ''
-        };
+                var adminUser = {
+                    username:'admin',
+                    password:'superSecret',
+                    loginToken:'',
+                    created: now,
+                    homeFolder: ''
+                };
 
-        Databases.Users.insert(adminUser, function (err, newDoc) {
-
-            console.log('Admin user added.');
-            homeFolder.user = newDoc._id;
-            Databases.Folders.insert(homeFolder,function(err,newFolder){
-              newDoc.homeFolder = newFolder._id;
-              console.log('Admin folder created');
-              newDoc.save(function(err){});
-              console.log(newDoc);
-            });
+                Databases.Users.insertOne(adminUser, function (err, newDoc) {
+                    console.log(newDoc);
+                    console.log('Admin user added.');
+                    homeFolder.user = newDoc.ops[0]._id;
+                    Databases.Folders.insertOne(homeFolder,function(err,newFolder){
+                      Databases.Users.findAndModify(
+                        {_id:newDoc.ops[0]._id},[],
+                        {$set:{homeFolder:newFolder.ops[0]._id}},{},
+                        function(err,doc){if(err) return console.log(err)}
+                      );
+                      console.log('Admin folder created');
+                    });
+                });
+            }else{
+                console.log('Admin user not added');
+            }
         });
+    });
+    return Databases;
+}
 
-    }else{
-        console.log('Admin user not added');
-    }
-});
-
-module.exports = Databases;
+module.exports = Databases.initialize();

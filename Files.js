@@ -17,7 +17,7 @@ app.use("/public",  express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(require('./Routes'));
-app.use('/files',require('./server/VirtualFilesystem'));
+app.use('/files',require('./server/Files'));
 
 var server = app.listen(app.get('port'), function(){
     console.log("Example app listening at http://localhost:%s", app.get('port'))
