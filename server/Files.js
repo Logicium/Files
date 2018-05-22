@@ -153,7 +153,7 @@ router.post('/signup',function(request,response){
             Databases.Users.insertOne(incomingUser,function(err,newUser){
                 if(err) return console.log('err');
                 var newId = new require('mongodb').ObjectID(newUser.ops[0]._id);
-                Databases.Folders.insertOne({type:'folder',created:Date.now(),user:newId,children:[]},function(err,docs){
+                Databases.Folders.insertOne({name:'Home',type:'folder',created:Date.now(),user:newId,children:[]},function(err,docs){
                     if(err) return console.log('err');
                     var folderId = new require('mongodb').ObjectID(docs.ops[0]._id);
                     Databases.Users.findAndModify({_id:newId},[],
