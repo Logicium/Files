@@ -4,8 +4,9 @@ var NewFolder = function (name,folderPath) {
     var self = this;
     this.viewFilePanel = dimensionalPanel();
     this.panelTitleBar = panelTitle('Add '+name);
-
+    this.uploadLoad = button('').append(icon('sync')).css('font-size','18px').css('margin','0').css('max-width','100%').removeClass('cta').addClass('uploadLoad animated rotateY infinite rev text-center').width('100%');
     this.uploadInput = input('Folder','file').css('display','none').attr('webkitdirectory','webkitdirectory').attr('multiple','multiple').change(function(){
+        $('.uploadButton').replaceWith(this.uploadLoad);
         var formData = new FormData();
         var inputVal = $(this).get(0).files;
         var newFolderName = inputVal[0].webkitRelativePath.split('/')[0];
@@ -23,6 +24,7 @@ var NewFolder = function (name,folderPath) {
                 contentType: false,
                 success:function(data){
                     swal.resetDefaults();
+                    $('.uploadLoad').replaceWith(self.upload);
                     swal({title:JSON.parse(data).message,text:JSON.stringify(JSON.parse(data).err),type:JSON.parse(data).type});
 
                 }
@@ -31,7 +33,7 @@ var NewFolder = function (name,folderPath) {
 
     });
 
-    this.upload =  button('Upload '+name).css('font-size','18px').css('margin','0').css('max-width','100%').removeClass('cta').addClass('rev text-center').width('100%').click(function(){
+    this.upload =  button('Upload '+name).css('font-size','18px').css('margin','0').css('max-width','100%').removeClass('cta').addClass('uploadButton rev text-center').width('100%').click(function(){
         self.uploadInput.click();
     });
 
@@ -44,7 +46,7 @@ var NewFolder = function (name,folderPath) {
 
         $.post('/files/newFolder',{token:Token,name:inputObject.name,folder:folderPath},function(data){
             swal.resetDefaults();
-            swal({title:data.message,type:data.type,timer:2000});
+            swal({title:data.message,type:data.type,timer:3000});
         });
 
     });
