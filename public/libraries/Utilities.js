@@ -12,7 +12,7 @@ function camelCase(str) {
 var searchForMatches = function searchForMatches(){
 
     $('.card').show();
-    var searchKey = $('.search').find('input').val().toLowerCase();
+    var searchKey = $('.search').val().toLowerCase();
     var providerCards = $('.card');
     console.log(searchKey);
 
