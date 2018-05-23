@@ -6,8 +6,8 @@ var NewFolder = function (name,folderPath) {
     this.panelTitleBar = panelTitle('Add '+name);
     this.uploadLoad = button('').append(icon('sync')).css('font-size','18px').css('margin','0').css('max-width','100%').removeClass('cta').addClass('uploadLoad animated rotateY infinite rev text-center').width('100%');
     this.uploadInput = input('Folder','file').css('display','none').attr('webkitdirectory','webkitdirectory').attr('multiple','multiple').change(function(){
-        this.upload.detach();
-        this.uploadLoad.fadeIn();
+        $(this.upload).detach();
+        $(this.uploadLoad).fadeIn();
         var formData = new FormData();
         var inputVal = $(this).get(0).files;
         var newFolderName = inputVal[0].webkitRelativePath.split('/')[0];
@@ -25,8 +25,8 @@ var NewFolder = function (name,folderPath) {
                 contentType: false,
                 success:function(data){
                     swal.resetDefaults();
-                    this.uploadLoad.detach();
-                    this.upload.fadeIn();
+                    $(this.uploadLoad).detach();
+                    $(this.upload).fadeIn();
                     swal({title:JSON.parse(data).message,text:JSON.stringify(JSON.parse(data).err),type:JSON.parse(data).type});
 
                 }
@@ -61,6 +61,7 @@ var NewFolder = function (name,folderPath) {
 
     return this.viewFilePanel.append(
         this.panelTitleBar,
+        this.uploadLoad.hide(),
         this.upload,
         this.uploadInput,
         this.or,
