@@ -1,6 +1,6 @@
 var FileCard = function (fileData) {
 
-    this.fileCard = col(3).removeClass('text-center').addClass('text-left').css(Styles.padding({t:'25px',a:'5px'})).click(function(){
+    this.fileCard = col(3).removeClass('text-center').addClass('card text-left').attr('data-info',JSON.stringify(fileData)).css(Styles.padding({t:'25px',a:'5px'})).click(function(){
 
         var nr = new NaviRow(fileData.name);
         $('.levelNavi').append(nr.playKeyframe(

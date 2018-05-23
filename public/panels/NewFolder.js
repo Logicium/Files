@@ -6,7 +6,8 @@ var NewFolder = function (name,folderPath) {
     this.panelTitleBar = panelTitle('Add '+name);
     this.uploadLoad = button('').append(icon('sync')).css('font-size','18px').css('margin','0').css('max-width','100%').removeClass('cta').addClass('uploadLoad animated rotateY infinite rev text-center').width('100%');
     this.uploadInput = input('Folder','file').css('display','none').attr('webkitdirectory','webkitdirectory').attr('multiple','multiple').change(function(){
-        $('.uploadButton').replaceWith(this.uploadLoad);
+        this.upload.detach();
+        this.uploadLoad.fadeIn();
         var formData = new FormData();
         var inputVal = $(this).get(0).files;
         var newFolderName = inputVal[0].webkitRelativePath.split('/')[0];
@@ -24,7 +25,8 @@ var NewFolder = function (name,folderPath) {
                 contentType: false,
                 success:function(data){
                     swal.resetDefaults();
-                    $('.uploadLoad').replaceWith(self.upload);
+                    this.uploadLoad.detach();
+                    this.upload.fadeIn();
                     swal({title:JSON.parse(data).message,text:JSON.stringify(JSON.parse(data).err),type:JSON.parse(data).type});
 
                 }

@@ -22,7 +22,7 @@ var FacePanel = function (FaceData) {
 
     this.panelTitleBar = panelTitle(FaceData.name);
 
-    this.searchBar = input('Search '+ FaceData.children.length+' items in '+FaceData.name);
+    this.searchBar = input('Search '+ FaceData.children.length+' items in '+FaceData.name).addClass('search');
 
     this.newFolderButton = buttonCol('Add Folder','folder',3).removeClass('cta').addClass('rev').css('color',transparentBlack()).click(function(){
 

@@ -9,6 +9,34 @@ function camelCase(str) {
     }).replace(/\s+/g, '');
 }
 
+var searchForMatches = function searchForMatches(){
+
+    $('.card').show();
+    var searchKey = $('.search').find('input').val().toLowerCase();
+    var providerCards = $('.card');
+    console.log(searchKey);
+
+    if(searchKey.length > 0) {
+
+        for (var i = 0; i < providerCards.length; i++) {
+            console.log($(providerCards[i]).attr('data-info'));
+            var cardData = JSON.parse($(providerCards[i]).attr('data-info'));
+            if(
+                (String(cardData["name"]).toLowerCase().indexOf(searchKey) >= 0 ) ||
+                (String(cardData["description"]).toLowerCase().indexOf(searchKey) >= 0) ||
+                (String(cardData["email"]).toLowerCase().indexOf(searchKey) >= 0) ||
+                (String(cardData["firstName"]).toLowerCase().indexOf(searchKey) >= 0) ||
+                (String(cardData["lastName"]).toLowerCase().indexOf(searchKey) >= 0)
+            ){ console.log('Adding search Result: ',cardData); }
+            else {
+                console.log('Not Matched: ',cardData);
+                $(providerCards[i]).hide();
+            }
+        }
+    }
+};
+$('body').on('keyup', '.search', searchForMatches);
+
 function syncJSON(i_url,data,callback) {
     $.ajax({
         type: "POST",

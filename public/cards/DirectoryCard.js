@@ -36,7 +36,7 @@ var DirectoryCard = function(directoryData){
         if( c.type == 'file' && /(jpg|gif|png|JPG|GIF|PNG|JPEG|jpeg)$/.test(c.extension) ) images.push(c)
     }
     var image = directoryData.image || 'public/images/bg4.jpg';
-    this.directoryCard = div().css('margin-top','25px');
+    this.directoryCard = div().addClass('card').css('margin-top','25px').attr('data-info',JSON.stringify(directoryData));
     this.directoryBanner = gradientImage(image,transparent(),transparentWhite()).append(
         row().append( col(3).append(highlightTextLight(directoryData.name)),col(6),col(3).append(highlightTextLight(directoryData.children.length+' Items')) )
     ).height('200px').addClass('hvr-bgfade').css('padding','75px').css('font-size','30px').css('font-family','Open Sans Condensed')
