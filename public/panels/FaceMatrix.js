@@ -81,24 +81,61 @@ var FacePanel = function (FaceData) {
 
     });
 
-    this.sortButton = buttonCol('Sort','sync',3).css('color','white');
-    this.orderButton = buttonCol('Ascending','arrow-up',3).css('color','white');
+    var AscendingButton = function(data){
+        self.directories.empty();
+        self.files.empty();
+        for(var index in FaceData.children){
+            if(FaceData.children[index].type === 'folder'){
+                self.directories.append(new DirectoryCard(FaceData.children[index]))
+            }
+            else if(FaceData.children[index].type === 'file'){
+                self.files.append(new FileCard(FaceData.children[index]))
+            }
+        }
+          return buttonCol('Ascending','arrow-up',3).click(function(){
+              $(this).replaceWith( new DescendingButton(data))
+          });
+      }
+
+      var DescendingButton = function(data){
+          var rev = data.reverse();
+          self.directories.empty();
+          self.files.empty();
+          for(var index in FaceData.children){
+              if(FaceData.children[index].type === 'folder'){
+                  self.directories.append(new DirectoryCard(FaceData.children[index]))
+              }
+              else if(FaceData.children[index].type === 'file'){
+                  self.files.append(new FileCard(FaceData.children[index]))
+              }
+          }
+          return buttonCol('Descending','arrow-down',3).addClass('descending').click(function(){
+              $(this).replaceWith( new AscendingButton(data.reverse()))
+          });
+      }
+    //this.sortButton = buttonCol('Sort','sync',3).css('color','white');
 
     this.toolBar = row();
     this.directories = div();
     this.files = row();
 
-    for(var index in FaceData.children){
+    this.orderButton = new AscendingButton(FaceData.children);
 
-        //syncJSON('',{_id:FaceData.children[index]},function(childData){
-          if(FaceData.children[index].type === 'folder'){
-              self.directories.append(new DirectoryCard(FaceData.children[index]))
-          }
-          else if(FaceData.children[index].type === 'file'){
-              self.files.append(new FileCard(FaceData.children[index]))
-          }
-        //});
-    }
+    this.sortButton = col(3).append( select('Sort By',['name','type','created']).on('change', function() {
+        var key = this.value;
+        FaceData.children = _.sortBy(FaceData.children,function (text) { console.log(text); return (text[key]+'').toLowerCase(); })
+        if($('.descending').length>0){FaceData.children = FaceData.children.reverse()}
+        self.directories.empty();
+        self.files.empty();
+        for(var index in FaceData.children){
+            if(FaceData.children[index].type === 'folder'){
+                self.directories.append(new DirectoryCard(FaceData.children[index]))
+            }
+            else if(FaceData.children[index].type === 'file'){
+                self.files.append(new FileCard(FaceData.children[index]))
+            }
+        }
+    }).css({'background-color':transparentBlack(),'color':'white'}) );
 
     return this.facePanel.append(
         this.panelTitleBar,

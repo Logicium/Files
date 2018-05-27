@@ -11,6 +11,15 @@ var dimensionalPanel = function() {
         .css('padding', '10px').css('margin', '10px').css('min-height', '600px').css('width', '95%');
 };
 
+var select = function(name,options){
+    var sel = $('<select>').height('50px').css('letter-spacing','6px').css('text-transform', 'uppercase')
+        .css('font-family','Open Sans Condensed').css('width','100%').css('text-align-last','center');
+    for(var i in options){
+        sel.append($('<option>').html(options[i]));
+    }
+    return sel;
+}
+
 var navDiv = function(){
     return col(2).addClass('hvr-underline-from-center').css('font-size','16px').css('line-height','50px')
         .css('height','50px').css('color','white').addClass('text-center').css('cursor','pointer')
@@ -21,7 +30,7 @@ var dimensionalWindow = function(perspective){
 };
 
 var col = function(colNum){
-    return  div().addClass('col-xs-'+colNum).addClass('text-center');
+    return  div().addClass('col-xs-'+colNum).addClass('text-center').css('cssText','padding:0;');
 };
 
 var roundIconSm = function(iconName){
