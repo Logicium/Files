@@ -7,7 +7,7 @@ var path = require('path');
 var jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 var DirectoryStructureJSON = require('directory-structure-json');
-//var Databases = require('./Databases');
+var Databases = require('./Databases');
 
 var transporter = nodemailer.createTransport({
     service: 'Gmail',
@@ -17,66 +17,74 @@ var transporter = nodemailer.createTransport({
     }
 });
 
-function dataChange(folder,callback){
-  var children = folder.children;
-  var newChildren = [];
-  var count = 0;
-  if(children.length === 0){folder.children=newChildren;callback(folder);}
-  for (var i = 0; i < children.length; i++) {
-    var childId = folder.children[i]+'';
-    console.log(childId);
-    var id = new require('mongodb').ObjectID(childId);
-    Databases.Files.findOne({_id:id},function(err,childDoc){
-      if(!(childDoc == null)){
-        console.log(childDoc);
-        newChildren.push(childDoc);
-        count++;
-        console.log(count,children.length)
-        if (count === children.length) {
-          folder.children = newChildren;
-          callback(folder);
+var express = require('express');
+var router = express.Router();
+var mongodb = require('mongodb');
+var Databases = require('./Databases');
+
+// Moved mongodb.ObjectId to top of script
+async function dataChange(folder){
+    let children = folder.children;
+    let newChildren = [];
+    if (children.length === 0) {
+        folder.children = newChildren;
+        return folder;
+    }
+    for (let i = 0; i < children.length; i++) {
+        let childId = children[i] + '';
+        console.log(childId);
+        let id = new mongodb.ObjectID(childId);
+
+        let childDoc = await Databases.Files.find({_id: id}).limit(1).toArray();
+        childDoc = childDoc[0];
+        if (!(childDoc == null)) {
+            console.log(childDoc);
+            newChildren.push(childDoc);
         }
-      }
-    });
-    Databases.Folders.findOne({_id:id},function(err,childDoc){
-      if(!(childDoc == null)){
-        console.log(childDoc);
-        if(childDoc.children.length>0){
-          dataChange(childDoc,function(completeFolder){
-            newChildren.push(completeFolder);
-            count++;
-            console.log(count,children.length);
-            if (count === children.length) {
-              folder.children = newChildren;
-              callback(folder);
+
+        childDoc = await Databases.Folders.find({_id: id}).limit(1).toArray();
+        childDoc = childDoc[0];
+        if (!(childDoc == null)) {
+            console.log(childDoc);
+            if (childDoc.children.length > 0) {
+                let completeFolder = await dataChange(childDoc);
+                newChildren.push(completeFolder);
+            } else {
+                newChildren.push(childDoc);
             }
-          });
         }
-        else{
-          newChildren.push(childDoc);
-          count++;
-          console.log(count,children.length);
-          if (count === children.length) {
-            folder.children = newChildren;
-            callback(folder);
-          }
-        }
-      }
-    });
-  }
+    }
+
+    folder.children = newChildren;
+    return folder;
 }
 
-router.post('/home',async function(request,response){
-    console.log(request.body);
-    var Databases = await require('./Databases');
-    Databases.Users.findOne({loginToken: request.body.token},function(err, doc) {
-        console.log(doc);
-        var id = new require('mongodb').ObjectID(doc.homeFolder);
-        Databases.Folders.findOne({_id:id},function(err,folder){
-            if(err){return console.log(err)}
-            dataChange(folder,function(completeFolder){response.send(completeFolder);});
-        });
-    });
+router.post('/home', async function(request, response){
+    try {
+        console.log(request.body);
+        var Databases = await require('./Databases');
+        let userDoc = await Databases.Users.find({loginToken: request.body.token}).limit(1).toArray();
+        userDoc = userDoc[0];
+        if(!userDoc) {
+            return response.status(404).json({ message: 'User not found' });
+        }
+
+        console.log("Requested User:");console.log(userDoc);
+        let id = userDoc.homeFolder;
+        console.log("ID: "+id);
+        let folder = await Databases.Folders.find({_id: id}).limit(1).toArray();
+        folder = folder[0];
+        console.log("Requested Folder:");console.log(folder);
+        if(folder) {
+            let completeFolder = await dataChange(folder);
+            response.send(completeFolder);
+        } else {
+            return response.status(404).json({ message: 'Folder not found' });
+        }
+    } catch (err) {
+        console.error(err);
+        response.status(500).json({ message: 'Internal server error' });
+    }
 });
 
 function ucfirst(str) {
@@ -153,7 +161,7 @@ router.post('/signup',function(request,response){
             incomingUser.verified = 'false';
             Databases.Users.insertOne(incomingUser,function(err,newUser){
                 if(err) return console.log('err');
-                var newId = new require('mongodb').ObjectID(newUser.ops[0]._id);
+                var newId = new mongodb.ObjectID(newUser.ops[0]._id);
                 Databases.Folders.insertOne({name:'Home',type:'folder',created:Date.now(),user:newId,children:[]},function(err,docs){
                     if(err) return console.log('err');
                     var folderId = new require('mongodb').ObjectID(docs.ops[0]._id);
