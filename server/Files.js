@@ -7,7 +7,7 @@ var path = require('path');
 var jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 var DirectoryStructureJSON = require('directory-structure-json');
-var Databases = require('./Databases');
+//var Databases = require('./Databases');
 
 var transporter = nodemailer.createTransport({
     service: 'Gmail',
@@ -66,8 +66,9 @@ function dataChange(folder,callback){
   }
 }
 
-router.post('/home',function(request,response){
+router.post('/home',async function(request,response){
     console.log(request.body);
+    var Databases = await require('./Databases');
     Databases.Users.findOne({loginToken: request.body.token},function(err, doc) {
         console.log(doc);
         var id = new require('mongodb').ObjectID(doc.homeFolder);
@@ -186,28 +187,64 @@ router.post('/verifyEmail',function(request,response){
 
 });
 
-router.post('/login', function (request, response) {
-
+router.post('/login', async function (request, response) {
     console.log("New user login request.");
     var incomingUser = request.body;
     console.log(incomingUser);
+    var Databases = await require('./Databases');
+    console.log('Databases: ' + Databases);
+    var users = await Databases.db.collection('users').find({
+        $and:[
+            {$or:[
+                    {username:incomingUser.username},
+                    {email:incomingUser.username}
+                ]},
+            {password:incomingUser.password}
+        ]}).limit(1).toArray();
 
-    var Users = Databases.Users.findOne({$and:[{$or:[{username:incomingUser.username},{email:incomingUser.username}]},{password:incomingUser.password}]},function(err,doc){
-        console.log(doc);
-        if (doc) {
-            var token = jwt.sign({U:incomingUser.username}, 'superSecret', {expiresIn: '24h'});
-            Databases.Users.findAndModify(
-              {$or:[{username:incomingUser.username},{email:incomingUser.username}]},[],
-              {$set:{loginToken:token}},{},
-              function(err,doc){if(err) return console.log(err)}
-            );
-            response.send({message: 'Login Success!', data:doc, success: true, token: token});
+    if (users && users[0]) {
+        var doc = users[0];
+        console.log('User found: ' + doc);
+        var token = jwt.sign({U:incomingUser.username}, 'superSecret', {expiresIn: '24h'});
+
+        const updateResult = await Databases.db.collection('users').findOneAndUpdate(
+            {$or:[{username:incomingUser.username},{email:incomingUser.username}]},
+            {$set:{loginToken:token}},
+            {returnOriginal: false} // This option returns the document after update
+        );
+        if (updateResult.value) {
+            doc = updateResult.value;
         }
-        else {
-            response.send({message: 'Login Fail', type: 'error'});
-        }
-    });
+
+        response.send({message: 'Login Success!', data:doc, success: true, token: token});
+    } else {
+        response.send({message: 'Login Fail', type: 'error'});
+    }
 });
+
+// router.post('/login', async function (request, response) {
+//     console.log("New user login request.");
+//     var incomingUser = request.body;
+//     console.log(incomingUser);
+//     var Databases = await require('./Databases');
+//     console.log('Databases: '+Databases);
+//     var Users = await Databases.Users.find({$and:[{$or:[{username:incomingUser.username},{email:incomingUser.username}]},{password:incomingUser.password}]}).limit(1).next(function(err,doc){
+//         console.log('User found: '+doc);
+//         if (doc) {
+//             var token = jwt.sign({U:incomingUser.username}, 'superSecret', {expiresIn: '24h'});
+//
+//             Databases.Users.findAndModify(
+//               {$or:[{username:incomingUser.username},{email:incomingUser.username}]},[],
+//               {$set:{loginToken:token}},{},
+//               function(err,doc){if(err) return console.log(err)}
+//             );
+//             response.send({message: 'Login Success!', data:doc, success: true, token: token});
+//         }
+//         else {
+//             response.send({message: 'Login Fail', type: 'error'});
+//         }
+//     });
+// });
 
 
 router.post('/image', function(request, response) {
